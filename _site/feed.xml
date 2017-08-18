@@ -5,501 +5,442 @@
     <description></description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Thu, 17 Aug 2017 23:43:04 +0800</pubDate>
-    <lastBuildDate>Thu, 17 Aug 2017 23:43:04 +0800</lastBuildDate>
+    <pubDate>Fri, 18 Aug 2017 14:09:34 +0800</pubDate>
+    <lastBuildDate>Fri, 18 Aug 2017 14:09:34 +0800</lastBuildDate>
     <generator>Jekyll v3.5.2</generator>
     
       <item>
-        <title>决定的沉重</title>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;游戏里，你底牌一对A，对手却在不断地加注，你要不要跟到底？&lt;/p&gt;
-&lt;/blockquote&gt;
+        <title>组播技术简介</title>
+        <description>&lt;h1 id=&quot;产生背景&quot;&gt;产生背景&lt;/h1&gt;
+
+&lt;p&gt;传统的IP通信方式主要有单播及广播两种方式。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;单播：&lt;/strong&gt; 在源主机与目的主机之间的点对点通信；&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;广播：&lt;/strong&gt; 在源主机与同一网段中所有其他主机之间点对多点的通信。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;缺点：&lt;/strong&gt; 欲要将信息发送给多个主机而非所有主机，若采用广播的方式，不仅会将信息发送给不需要的主机而浪费资源，而且也不能够实现跨网段发送；若采用单播的方式，重复的IP包不仅会占用大量带宽，而且会增加源主机的负载。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;组播：&lt;/strong&gt; 指在IP网络中，将数据包以尽力传送的形式发送给某个确定的节点集合（即组播组），其基本思想是：源主机（组播源）只发送一份数据，其目的地址为组播组地址，组播组中的所有接受者都可收到同样的数据拷贝，并且只有组播组内的主机可以接收该数据包，其他主机则不能接收。&lt;/p&gt;
+
+&lt;h1 id=&quot;技术优点&quot;&gt;技术优点&lt;/h1&gt;
+
+&lt;p&gt;有效地解决了单点发送、多点接收的问题，实现了IP网络中点到多点的高效数据传送，能节约大量的网络带宽、降低网络负载。网络的组播特性可以提供更加丰富的业务，如在线直播、网络电视、远程教育、网络电台、实时视频会议等信息服务。&lt;/p&gt;
+
+&lt;h1 id=&quot;实现&quot;&gt;实现&lt;/h1&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;组播源向一组确定的接受者发送信息，如何来标识这组确定的接受者？–&lt;a href=&quot;&quot;&gt;组播地址机制&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;接收者通过加入组播组来实现对组播信息的接收，接收者是如何动态地加入或离开组播组的？ –&lt;a href=&quot;&quot;&gt;组成员关系管理&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;组播报文在网络中是如何被转发并最终到达接受者的？–&lt;a href=&quot;&quot;&gt;组播报文转发&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;组播报文的转发路径（组播转发树）是如何构建的？–&lt;a href=&quot;&quot;&gt;组播路由协议&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;1-组播地址机制&quot;&gt;1. 组播地址机制&lt;/h2&gt;
+
+&lt;h3 id=&quot;11-ip组播地址&quot;&gt;1.1 IP组播地址&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://ouqpou19v.bkt.clouddn.com/%E7%BB%84%E6%92%AD%E5%9C%B0%E5%9D%80%E6%A0%BC%E5%BC%8F.png&quot; alt=&quot;组播地址格式&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;IP组播地址用于标识一个IP组播组，D类地址空间之分配给组播使用的，范围是224.0.0.0~239.255.255。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://ouqpou19v.bkt.clouddn.com/IP%E7%BB%84%E6%92%AD%E5%9C%B0%E5%9D%80%E5%88%92%E5%88%86.png&quot; alt=&quot;IP组播地址划分&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;12-ip组播地址到链路层的映射&quot;&gt;1.2 IP组播地址到链路层的映射&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://ouqpou19v.bkt.clouddn.com/IP%E7%BB%84%E6%92%AD%E5%9C%B0%E5%9D%80%E5%88%B0%E7%BB%84%E6%92%ADMAC%E5%9C%B0%E5%9D%80%E7%9A%84%E6%98%A0%E5%B0%84.png&quot; alt=&quot;IP组播地址到组播MAC地址的映射&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;IANA将MAC地址范围01:00:5E:00:00:00～01:00:5E:7F:FF:FF分配给组播使用，这就要求将28位的IP组播地址空间映射到23位的组播MAC地址空间中，具体的映射方法是将组播地址中的低23位放入MAC地址的低23位 。由于IP组播地址的后28位中只有23位被映射到组播MAC地址，这样会有32个IP组播地址映射到同一组播MAC地址上。&lt;/p&gt;
+
+&lt;h2 id=&quot;2-组成员关系管理&quot;&gt;2. 组成员关系管理&lt;/h2&gt;
+
+&lt;p&gt;组成员关系管理是指在路由器/交换机上建立直联网段内的组成员关系信息，具体就是各接口/端口下有哪些组播组的成员。&lt;/p&gt;
+
+&lt;h3 id=&quot;21-igmp&quot;&gt;2.1 IGMP&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;IGMP&lt;/strong&gt;运行于主机和与主机直连的路由器之间，其实现的功能是双向的：一方面，主机通过&lt;strong&gt;IGMP&lt;/strong&gt;通知路由器希望接收某个特定组播组的信息；另一方面，路由器通过&lt;strong&gt;IGMP&lt;/strong&gt;周期性地查询局域网内的组播组成员是否处于活动状态，实现所连网段组成员关系的收集与维护。通过&lt;strong&gt;IGMP&lt;/strong&gt;，在路由器中记录的信息是某个组播组是否在本地有组成员，而不是组播组与主机之间的对应关系。&lt;/p&gt;
+
+&lt;p&gt;目前共有三个版本的IGMP：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;IGMPv1&lt;/strong&gt;(RFC 1112)中定义了基本的组成员查询和报告过程；&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;IGMPv2&lt;/strong&gt;(RFC 2236)在 &lt;strong&gt;IGMPv1&lt;/strong&gt; 的基础上添加了组成员快速离开的机制等；&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;IGMPv3&lt;/strong&gt;(RFC 3376)中增加的主要功能是成员可以指定接收或拒绝来自某些组播源的报文，以实现对 &lt;strong&gt;SSM&lt;/strong&gt; 模型的支持。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;下面是&lt;strong&gt;IGMPv2&lt;/strong&gt;的工作原理图：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://ouqpou19v.bkt.clouddn.com/IGMPV2%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86.PNG&quot; alt=&quot;IGMPV2工作原理&quot; /&gt;&lt;/p&gt;
 
 &lt;blockquote&gt;
-  &lt;p&gt;回国找工作接到几个 offer ，各有利弊，看起来也差不多，你要选哪个？&lt;/p&gt;
+  &lt;p&gt;当同一个网段内有多个IGMP路由器时， IGMPv2通过查询器选举机制从中选举出唯一的查询器。查询器周期性地发送普遍组查询消息进行成员关系查询，主机通过发送报告消息来响应查询。而作为组成员的路由器，其行为也与普通主机一样，响应其它路由器的查询。&lt;/p&gt;
+
+  &lt;p&gt;当主机要加入组播组时，不必等待查询消息，而是主动发送报告消息；当主机要离开组播组时，也会主动发送离开组消息，查询器收到离开组消息后，会发送特定组 查询消息来确定该组的所有组成员是否都已离开。&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;blockquote&gt;
-  &lt;p&gt;前路未定，小县房价堪忧，涨跌未定，你要怎么处理闲置资产？&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;p&gt;通过上述机制，在路由器里建立起一张表，其中记录了路由器各接口所对应子网上都有哪些组的成员。当路由器收到发往组G的组播数据后，只向那些有G的成员的接口转发该数据。至于组播数据在路由器之间如何转发则由组播路由协议决定，而不是IGMP的功能。&lt;/p&gt;
 
-&lt;blockquote&gt;
-  &lt;p&gt;财报发布在即，手中股票微涨微跌，不知道财报如何，你要买入还是卖出？&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;h3 id=&quot;22-igmp-snooping&quot;&gt;2.2 IGMP Snooping&lt;/h3&gt;
 
-&lt;p&gt;人一旦有权力决定自己的事情了，随之而来的就是承担决定的痛苦和后果。即便这样分量的决定不多，但每一个都成顿重，你根本不知道自己能不能承受这决定的后果。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;IGMP&lt;/strong&gt;是针对IP层设计的，只能记录路由器上的三层接口与IP组播地址的对应关系。但在很多情况下，组播报文不可避免地要经过一些交换机，如果没有一种机制将二层端口与组播MAC地址对应起来，组播报文就会转发给交换机的所有端口，这显然会浪费大量的系统资源。&lt;/p&gt;
 
-&lt;p&gt;这大概是每个人成熟前的考验。单纯伤怀无疑于事，不如记下几点算在几点指点：&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;IGMP Snooping&lt;/strong&gt;的出现就可以解决这个问题，其工作原理为：主机发往&lt;strong&gt;IGMP&lt;/strong&gt;查询器的报告消息经过交换机时，交换机对这个消息进行监听并记录下来，为端口和组播MAC地址建立起映射关系；当交换机收到组播数据时，根据这样的映射关系，只向连有组成员的端口转发组播数据。&lt;/p&gt;
 
+&lt;h2 id=&quot;3-组播报文转发&quot;&gt;3. 组播报文转发&lt;/h2&gt;
+
+&lt;h3 id=&quot;31-组播转发树&quot;&gt;3.1 组播转发树&lt;/h3&gt;
+
+&lt;p&gt;组播报文在网络中是沿着树型转发路径进行转发的，该路径称为组播转发树，可分为源树和共享树两类。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;源树：&lt;/strong&gt; 指以组播源作为树根，将组播源到每个接受者的最短路径结合起来构成的转发树，源树也称为最短路径树(SRT)。&lt;/p&gt;
+
+&lt;p&gt;源树的优点是能构造组播源和接收者之间的最短路径，使端到端的延迟达到最小。但付出的代价是，在路由器中必须为每个组播源保存路由信息，这样会占用大量的系统资源，路由表的规模也比较大。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;共享树：&lt;/strong&gt; 以某个路由器作为路由树的树根，该路由器称为汇集点（RP），共享树就是由RP到所有接收者的最短路路径所共同构成的转发树。使用共享树时，对应某个组网络中只有一棵树。所有的组播源和接收者都使用这棵树来收发报文，组播源先向树根发送数据报文，之后报文又向下转发到达所有的接收者。&lt;/p&gt;
+
+&lt;p&gt;共享树的最大优点是路由器中保留的路由信息可以很少，缺点是组播源发出的报文要先经过RP，再到达接收者，经由的路径通常并非最短，而且对RP的可靠性和处理能力要求很高。&lt;/p&gt;
+
+&lt;h3 id=&quot;32-组播报文转发机制&quot;&gt;3.2 组播报文转发机制&lt;/h3&gt;
+
+&lt;p&gt;当路由器收到组播数据报文时，根据组播目的地址查找组播转发表，对报文进行转发。与单播报文的转发相比，组播报文的转发相对复杂：在单播报文的转发过程中，路由器并不关心报文的源地址，只关心报文的目的地址，通过其目的地址决定向哪个接口转发；而组播报文是发送给一组接收者的，这些接收者用一个逻辑地址（即组播地址）标识，路由器在收到组播报文后，必须根据报文的源地址确定其正确的入接口（指向组播源方向）和下游方向，然后将其沿着远离组播源的下游方向转发——这个过程称为逆向路径转发（RPF）。&lt;/p&gt;
+
+&lt;p&gt;在RPF执行过程中会利用原有的单播路由表确定上、下游的邻接节点，只有报文从上游节点所对应的接口（称为RPF接口，即路由器上通过单播方式向该地址发送报文的出接口）到达时，才向下游转发。 RPF的主体是RPF检查，通过RPF检查除了可以正确地按照组播路由的配置转发报文外，还可以避免可能出现的环路。路由器收到组播报文后先对其进行RPF检查，只有检查通过才执行转发。&lt;/p&gt;
+
+&lt;p&gt;RPF检查的过程为：路由器在单播路由表中查找组播源或RP对应的RPF接口（使用SPT时查找组播源对应的RPF接口，使用RPT时查找RP对应的RPF接口），如果组播报文是从RPF接口接收下来的，则RPF检查通过，报文向下游接口转发；否则，丢弃该报文。&lt;/p&gt;
+
+&lt;h2 id=&quot;4-组播路由协议&quot;&gt;4. 组播路由协议&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;域内组播路由协议：根据 IGMP 协议维护的组成员关系信息，运用一定的组播路由算法构造组播分发树，在路由器中建立组播路由状态，路由器根据这些状态进行组播数据包转发；&lt;/li&gt;
+  &lt;li&gt;域间组播路由协议：根据网络中配置的域间组播路由策略，在各自治系统间发布具有组播能力的路由信息以及组播源信息，使组播数据能在域间进行转发。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;5-组播模型分类&quot;&gt;5. 组播模型分类&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;ASM&lt;/strong&gt;模型：即任意源组播模型。在 ASM 模型中，任一发送者都可作为组播源向某组播组地址发送组播信息，接收者通过加入由该组播组地址标识的组播组以获得发往该组播组的组播信息。在 ASM 模型中，接收者无法预先知道组播源的位置，但可以在任意时间加入或离开组播组。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;SSM&lt;/strong&gt;模型：即指定信源组播模型。在现实生活中，用户可能只对某些组播源发送的组播信息感兴趣，而不愿接收其它源发送的信息。 SSM 模型为用户提供了一种能够在客户端指定组播源的传输服务。&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Sun, 20 Mar 2016 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2016/03/20/multicast/</link>
+        <guid isPermaLink="true">http://localhost:4000/2016/03/20/multicast/</guid>
+        
+        <category>Multicast</category>
+        
+        <category>Computer Network</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>遗传算法简述</title>
+        <description>&lt;p&gt;&lt;strong&gt;遗传算法&lt;/strong&gt; (genetic algorithm, GA )是&lt;a href=&quot;https://zh.wikipedia.org/wiki/%E8%AE%A1%E7%AE%97%E6%95%B0%E5%AD%A6&quot;&gt;计算数学&lt;/a&gt;中用于解决&lt;a href=&quot;https://zh.wikipedia.org/wiki/%E6%9C%80%E4%BD%B3%E5%8C%96&quot;&gt;最佳化&lt;/a&gt;的搜索&lt;a href=&quot;https://zh.wikipedia.org/wiki/%E7%AE%97%E6%B3%95&quot;&gt;算法&lt;/a&gt;，是&lt;a href=&quot;https://zh.wikipedia.org/wiki/%E8%BF%9B%E5%8C%96%E7%AE%97%E6%B3%95&quot;&gt;进化算法&lt;/a&gt;的一种。进化算法最初是借鉴了&lt;a href=&quot;https://zh.wikipedia.org/wiki/%E8%BF%9B%E5%8C%96%E7%94%9F%E7%89%A9%E5%AD%A6&quot;&gt;进化生物学&lt;/a&gt;中的一些现象而发展起来的，这些现象包括&lt;a href=&quot;https://zh.wikipedia.org/wiki/%E9%81%97%E4%BC%A0&quot;&gt;遗传&lt;/a&gt;、&lt;a href=&quot;https://zh.wikipedia.org/wiki/%E7%AA%81%E5%8F%98&quot;&gt;突变&lt;/a&gt;、&lt;a href=&quot;https://zh.wikipedia.org/wiki/%E8%87%AA%E7%84%B6%E9%80%89%E6%8B%A9&quot;&gt;自然选择&lt;/a&gt;以及&lt;a href=&quot;https://zh.wikipedia.org/wiki/%E6%9D%82%E4%BA%A4&quot;&gt;杂交&lt;/a&gt;等。遗传算法是模拟生物在自然环境中的遗传和进化过程而形成的一种自适应全局优化概率搜索算法。最早由美国密执安大学的&lt;em&gt;Holland&lt;/em&gt; 教授提出，起源于60年代对自然和人工自适应系统的研究。70年代&lt;em&gt;De Jong&lt;/em&gt; 基于遗传算法的思想在计算机上进行了大量的纯数值函数优化计算实验。在一系列研究工作的基础上，80年代由&lt;em&gt;Goldberg&lt;/em&gt; 进行归纳总结，形成了遗传算法的基础框架。&lt;/p&gt;
+
+&lt;h1 id=&quot;生物学基础&quot;&gt;生物学基础&lt;/h1&gt;
+
+&lt;p&gt;生物在自然界中的生存繁衍，显示出了其对自然环境的优异自适应能力。受其启发，人们致力于对生物各种生存特性的机理研究和行为模拟，为人工自适应系统的设计和开发提供了广阔的前景。遗传算法就是这种生物行为的计算机模拟中的重要成果。基于对生物遗传和进化过程的计算机模拟，遗传算法使得各种人工系统具有优良的自适应能力和优化能力。遗传算法所借鉴的生物学基础就是生物的遗传和进化。&lt;/p&gt;
+
+&lt;h2 id=&quot;遗传与变异&quot;&gt;遗传与变异&lt;/h2&gt;
+
+&lt;p&gt;世间万物从其亲代继承特性或性状，这种生命现象就成为遗传（&lt;em&gt;Heredity&lt;/em&gt;），研究这种生命现象的科学称之为遗传学。由于遗传的作用，使得人们可以种瓜得瓜种豆得豆，也使得鸟能在天空中飞翔，鱼能在水中遨游。&lt;/p&gt;
+
+&lt;p&gt;构成生物的基本结构和功能的单位是细胞（&lt;em&gt;Cell&lt;/em&gt;）。细胞中含有的一种微小的化合物称为染色体（&lt;em&gt;Chromosome&lt;/em&gt;），生物的所有遗传信息均包含在这个复杂而又微小的染色体中。遗传信息是由基因（&lt;em&gt;Gene&lt;/em&gt;）组成的，生物的各种性状由其对应的基因所控制，基因是遗传的基本单位。细胞通过分裂具有自我复制的能力，在细胞分裂的过程中，其遗传基因也被下一代所继承。经生物学家研究，现在人们已经明白控制并决定生物遗传性状的染色体主要由一种叫做DNA的物质所构成，除此之外，染色体中还含有大量的蛋白质。DNA在染色体中有规则的排列着，其基本单位是核苷酸。&lt;/p&gt;
+
+&lt;p&gt;遗传基因在染色体中所占有的位置称为基因座（&lt;em&gt;Locus&lt;/em&gt;），同一基因座可能有的全部基因称为等位基因（&lt;em&gt;Allele&lt;/em&gt;）。某种生物所特有的基因及其构成形式称为该生物的基因型，而该生物在环境中呈现出的相应的性状称为该生物的表现型。&lt;/p&gt;
+
+&lt;p&gt;细胞在分裂时，DNA通过复制（&lt;em&gt;Reproduction&lt;/em&gt;）而转移到新产生的细胞中，新细胞就继承了旧细胞的基因。有性生殖生物在繁殖下一代时，两个同源染色体之间通过交叉（&lt;em&gt;Crossover&lt;/em&gt;）而重组，即在两个染色体的某一相同位置处DNA被切断，其前后两串分别交叉组合而形成两个新的染色体。另外，在细胞复制时，虽然概率很小，但也有可能产生某些复制差错，从而使DNA发生某种变异（&lt;em&gt;Mutation&lt;/em&gt;），产生出新的染色体。这些新的染色体表现出新的性状。如此，遗传基因或染色体在遗传的过程中由于各种各样的原因而发生变化。&lt;/p&gt;
+
+&lt;h2 id=&quot;进化&quot;&gt;进化&lt;/h2&gt;
+
+&lt;p&gt;生物在其延续生存的过程中，逐渐适应于其生存环境，使得其品质不断得到改良，这种生命现象称之为进化（&lt;em&gt;Evolution&lt;/em&gt;）。生物的进化是以集团的形式共同进行的，这种的一个团体称为群体（&lt;em&gt;Population&lt;/em&gt;），组成群体的单个生物称为个体（&lt;em&gt;Individual&lt;/em&gt;），每一个个体对其生存环境都有不同的适应能力，这种适应能力称之为个体的适应度（&lt;em&gt;Fitness&lt;/em&gt;）。达尔文的自然选择学说构成了现代进化论的主体。自然选择学说认为 ，通过不同生物之间的交配及其他一些原因，生物的基因有可能发生变异而形成一种新的生物基因，这部分变异了的基因也有可能将遗传到下一代。虽然这种变化的概率是可以预测的，但具体哪一个个体发生变化却是偶然的。这种新的基因依据其与环境的适应程度决定其生殖能力，有利于生存环境的基因逐渐增多，而不利于生存环境的基因逐渐减少。通过这种自然的选择，物种将逐渐地向适应于生存环境的方向进化，从而产生出优良的物种。&lt;/p&gt;
+
+&lt;h2 id=&quot;遗传与进化系统观&quot;&gt;遗传与进化系统观&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;生物的所有遗传信息均包含在其染色体中，染色体决定了生物的性状；&lt;/li&gt;
+  &lt;li&gt;染色体是由基因及其有规律的排列所构成的，遗传和进化过程发生在染色体上；&lt;/li&gt;
+  &lt;li&gt;生物的繁殖过程是由其基因的复制过程来完成的；&lt;/li&gt;
+  &lt;li&gt;通过同源染色体之间的交叉或染色体的变异会产生新的物种，使生物呈现新的性状；&lt;/li&gt;
+  &lt;li&gt;对环境适应性好的基因或染色体经常比适应性差的基因或染色体有更多的机会被遗传到下一代。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&quot;遗传算法&quot;&gt;遗传算法&lt;/h1&gt;
+
+&lt;h2 id=&quot;最优化问题&quot;&gt;最优化问题&lt;/h2&gt;
+
+&lt;p&gt;对于一个求函数最大值优化问题（最小值类似），一般可描述为下述数学规划模型：
+&lt;script type=&quot;math/tex&quot;&gt;max f(X)&lt;/script&gt;&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;s.t. X\in R&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;R\subseteq U&lt;/script&gt;
+
+&lt;p&gt;式中，&lt;em&gt;X&lt;/em&gt; 为决策变量，&lt;em&gt;f(X)&lt;/em&gt; 为目标函数。对于这些最优化问题，目标函数和约束条件种类繁多，有的是线性的，有的是非线性的；有的是连续的，有的是离散的；有的是单峰值的，有的是多峰值的。随研究的深入，人们逐渐认识到很多复杂情况下要想完全精确地求解出最优解既不可能也不现实，因而求出其近似最优解或满意解是人们的主要着眼点之一。总体来讲，求最优解或近似最优解的方法主要有三种：枚举法、启发式算法和搜索算法。&lt;/p&gt;
+
+&lt;h2 id=&quot;遗传算法优化思路&quot;&gt;遗传算法优化思路&lt;/h2&gt;
+&lt;p&gt;遗传算法中，将&lt;em&gt;n&lt;/em&gt;维决策向量 &lt;script type=&quot;math/tex&quot;&gt;X = [x_1, x_2, ..., x_n]^T&lt;/script&gt; 用 &lt;em&gt;n&lt;/em&gt; 个记号 &lt;script type=&quot;math/tex&quot;&gt;X_i(i = 1, 2, ..., n)&lt;/script&gt; 所组成的符号串&lt;em&gt;X&lt;/em&gt; 来表示：
+&lt;script type=&quot;math/tex&quot;&gt;X=X_1X_2...X_n \Rightarrow X=[x_1, x_2, ..., x_n]^T&lt;/script&gt;
+把每一个&lt;script type=&quot;math/tex&quot;&gt;X_i&lt;/script&gt; 看作是一个遗传基因，它的所有的可能取值称为等位基因，这样，&lt;em&gt;X&lt;/em&gt; 就可看做是由&lt;em&gt;n&lt;/em&gt; 个遗传基因所组成的一个染色体。一般情况下，染色体的长度&lt;em&gt;n&lt;/em&gt; 是固定的，但对一些问题来讲，&lt;em&gt;n&lt;/em&gt; 有可能是变化的。染色体 &lt;script type=&quot;math/tex&quot;&gt;X&lt;/script&gt; 也称为个体 &lt;script type=&quot;math/tex&quot;&gt;X&lt;/script&gt; ，对于每一个个体，要按照一定的规则确定其适应度。个体的适应度与其对应的个体表现型 &lt;script type=&quot;math/tex&quot;&gt;X&lt;/script&gt; 的目标函数值相关联， &lt;script type=&quot;math/tex&quot;&gt;X&lt;/script&gt; 越接近于目标函数的最优点，其适应度越大；相反，其适应度越小。&lt;/p&gt;
+
+&lt;p&gt;遗传算法中，决策变量 &lt;script type=&quot;math/tex&quot;&gt;X&lt;/script&gt; 组成了问题的解空间。对于问题最优解的搜索是通过对染色体 &lt;script type=&quot;math/tex&quot;&gt;X&lt;/script&gt; 的搜索过程来进行的，从而有所有的染色体 &lt;script type=&quot;math/tex&quot;&gt;X&lt;/script&gt; 就组成了问题的搜索空间。&lt;/p&gt;
+
+&lt;p&gt;生物的进化是以集团为主体的。与此相对应，遗传算法的运算对象是由&lt;script type=&quot;math/tex&quot;&gt;M&lt;/script&gt; 个个体所组成的集合，称之为群体。与生物一代一代的自然进化过程相类似，遗传算法的运算过程也是一个反复迭代的过程，第 &lt;script type=&quot;math/tex&quot;&gt;t&lt;/script&gt; 代群体记作 &lt;script type=&quot;math/tex&quot;&gt;P(t)&lt;/script&gt; ，经过一代遗传和进化后，得到第&lt;script type=&quot;math/tex&quot;&gt;t+1&lt;/script&gt; 代群体，它们也是由多个个体组成的集合，记作 &lt;script type=&quot;math/tex&quot;&gt;P(t+1)&lt;/script&gt;  。这个群体不断地经过遗传和进化操作，并且每次都按照优胜劣汰的规则将适应度较高的个体更多的遗传到下一代，这样最终在群体中将会得到一个优良的个体 &lt;script type=&quot;math/tex&quot;&gt;X&lt;/script&gt; ，它所对应的表现型 
+&lt;script type=&quot;math/tex&quot;&gt;X&lt;/script&gt;
+将达到或接近于问题的最优解 
+&lt;script type=&quot;math/tex&quot;&gt;X^*&lt;/script&gt;
+。&lt;/p&gt;
+
+&lt;p&gt;生物的进化过程主要是通过染色体之间的交叉和变异来完成的，与此相对应的，遗传算法中最优解的搜索过程也模仿了生物的这一进化过程，使用所谓的遗传算子作用于群体 
+&lt;script type=&quot;math/tex&quot;&gt;P(t)&lt;/script&gt;
+中，进行下述操作，从而得到新一代群体 
+&lt;script type=&quot;math/tex&quot;&gt;P(t+1)&lt;/script&gt;
+。&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;选择（&lt;em&gt;Selection&lt;/em&gt;）：根据每个个体的适应度，按照一定的规则，从第 
+&lt;script type=&quot;math/tex&quot;&gt;t&lt;/script&gt;
+代群体 
+&lt;script type=&quot;math/tex&quot;&gt;P(t)&lt;/script&gt;
+中选择出一些优良的个体遗传到下一代群体 
+&lt;script type=&quot;math/tex&quot;&gt;P(t+1)&lt;/script&gt;
+中。&lt;/li&gt;
+  &lt;li&gt;交叉（&lt;em&gt;Crossover&lt;/em&gt;）：将群体中 
+&lt;script type=&quot;math/tex&quot;&gt;P(t)&lt;/script&gt;
+内的每个个体随机搭配成对，对每个个体，以某种概率（交叉概率）交换它们之间的部分染色体。&lt;/li&gt;
+  &lt;li&gt;变异（&lt;em&gt;Mutation&lt;/em&gt;）：对群体 
+&lt;script type=&quot;math/tex&quot;&gt;P(t)&lt;/script&gt;
+中的每个给他，以某种概率（变异概率）改变某一个或者某一些基因座上的基因值为其他的等位基因。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;运算过程&quot;&gt;运算过程&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;步骤一&lt;/strong&gt; ：初始化。设置进化代数计数器 
+&lt;script type=&quot;math/tex&quot;&gt;t \leftarrow 0&lt;/script&gt;
+;设置最大进化代数
+&lt;script type=&quot;math/tex&quot;&gt;T&lt;/script&gt;
+；随机生成 
+&lt;script type=&quot;math/tex&quot;&gt;M&lt;/script&gt;
+个个体作为初始种群 
+&lt;script type=&quot;math/tex&quot;&gt;P(0)&lt;/script&gt;
+。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;步骤二&lt;/strong&gt;：个体评价。计算群体 
+&lt;script type=&quot;math/tex&quot;&gt;P(t)&lt;/script&gt;
+中各个个体的适应度。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;步骤三&lt;/strong&gt;：选择运算。将选择算子作用于群体。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;步骤四&lt;/strong&gt;：交叉运算。将交叉算子作用于群体。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;步骤五&lt;/strong&gt;：变异运算。将变异算子作用于群体。群体
+&lt;script type=&quot;math/tex&quot;&gt;P(t)&lt;/script&gt;
+通过选择、交叉、变异运算过后，得到下一代群体 
+&lt;script type=&quot;math/tex&quot;&gt;P(t+1)&lt;/script&gt;
+。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;步骤六&lt;/strong&gt;：终止条件判断。若 
+&lt;script type=&quot;math/tex&quot;&gt;t \leq T&lt;/script&gt;
+，则：
+&lt;script type=&quot;math/tex&quot;&gt;t \leftarrow t+1&lt;/script&gt;
+，转到步骤二；若
+&lt;script type=&quot;math/tex&quot;&gt;t &gt; T&lt;/script&gt;
+，则以进化过程中得到的具有最大适应度的个体作为最优解输出，终止计算。&lt;/p&gt;
+
+&lt;h2 id=&quot;特点&quot;&gt;特点&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;以决策变量的编码作为运算对象&lt;/li&gt;
+  &lt;li&gt;直接以目标函数值作为搜索信息&lt;/li&gt;
+  &lt;li&gt;同时使用多个搜索点的搜索信息&lt;/li&gt;
+  &lt;li&gt;使用概率搜索技术&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&quot;基本遗传算法&quot;&gt;基本遗传算法&lt;/h1&gt;
+
+&lt;h2 id=&quot;构成要素&quot;&gt;构成要素&lt;/h2&gt;
 &lt;ol&gt;
   &lt;li&gt;
-    &lt;p&gt;担心自己的决定后果，大多数时候是因为自己掌握的信息量不够。说道房价正是这样的典型案例。租的房子要卖，来看房的人考虑的是这时段房价趋稳，也寄希望于以后的涨势，所以想趁着时间购入。这边是信息量多的。&lt;/p&gt;
-
-    &lt;p&gt;小县则是土地富足，房价多有下降，以后发展也不过尔尔，所以卖出也是正确之举。不过因为大家都是一介屁民，举手间把几家人的财富腾挪起来，也是觉得负担压人。&lt;/p&gt;
+    &lt;p&gt;染色体编码方法。基本遗传算法使用固定长度的二进制符号串来表示群体中的个体，其等位基因是由二进制符号集
+&lt;script type=&quot;math/tex&quot;&gt;{0, 1}&lt;/script&gt;
+所组成的。初始群体中各个个体的基因值可用均匀分布的随机数来生成。如
+&lt;script type=&quot;math/tex&quot;&gt;X=100111001000101101&lt;/script&gt;
+就可以表示一个个体，该个体的染色体长度是18。&lt;/p&gt;
   &lt;/li&gt;
   &lt;li&gt;
-    &lt;p&gt;决定之间，自然会受到各种折磨。说是好事多磨，也让人不安。不过即便是损失几万，十几万，过后其实也就是吐槽埋怨几句罢了。人真的太坚强了。早知这样，决定中的焦虑不妨看开点，不妨放轻松，也不妨快刀乱麻。&lt;/p&gt;
+    &lt;p&gt;个体适应度评价。基本遗传算法按与个体适应度成正比的概率来决定当前群体中每个个体遗传到下一代群体中的机会多少。为了正确计算这个概率，这里要求所有个体的适应度必须为正数或者零。&lt;/p&gt;
   &lt;/li&gt;
   &lt;li&gt;
-    &lt;p&gt;多是心中有欲望，所以想着靠一个决定就能实现财富自由，就能飞黄腾达。这自然是不可能，不如早早放弃这样的想法。钱是慢慢赚的，即便是辛苦钱，半生下来也有不错的积累。说道这，慢慢把钱攒起来，这个中国人最爱的事情是最最有用的。莫说什么消费理念，不如看着账户慢慢增长来的爽快。把钱存起来或者买点增值的吧。&lt;/p&gt;
+    &lt;p&gt;遗传算子。基本遗传算法使用下述三种遗传算子：&lt;/p&gt;
   &lt;/li&gt;
-  &lt;li&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
-</description>
-        <pubDate>Sun, 06 Aug 2017 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/2017/08/06/jueding/</link>
-        <guid isPermaLink="true">http://localhost:4000/2017/08/06/jueding/</guid>
-        
-        <category>瞎扯</category>
-        
-        <category>随想录</category>
-        
-        <category>生活</category>
-        
-        
-      </item>
-    
-      <item>
-        <title>大部分工作是平庸的</title>
-        <description>&lt;p&gt;最大的感受是，工作很多时候确实繁琐而低效，让人心累却对最终的结构影响不大。不光是以前负责市场活动，还是现在做商业支持，这种感觉越来越强烈。&lt;/p&gt;
-
-&lt;p&gt;一部电影的票房在拍摄的时候基本就已经却确定了，甚至在筹划的时候就确定了。也不怪年轻演员会那么抢手，因为自带流量，也不怪制片为什么要哄着他们，因为一个明星确实是电影和活动最大的流量保障。&lt;/p&gt;
-
-&lt;p&gt;这看起来对精心制作的作品很不公平，可是再烂的活动都是背后的人加班加点制作的，没有一场活动是轻轻松松就实现广泛传播。&lt;/p&gt;
-
-&lt;p&gt;大部分工作平庸且无趣，只能用最后的成果来获取成就感。如果最后成果不错，那已经是万幸了。&lt;/p&gt;
-
-&lt;p&gt;所以，参与有趣且成功的活动或者工作简直是人生大幸。遇到这种幸运是小概率事件，而小概率事件是不值得期待的。&lt;/p&gt;
-
-&lt;p&gt;其他的事件基本都应该是这样的。&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;选择运算使用比例选择算子；&lt;/li&gt;
+  &lt;li&gt;交叉运算使用单点交叉算子；&lt;/li&gt;
+  &lt;li&gt;变异运算使用基本位变异算子或均匀变异算子。&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;ol&gt;
-  &lt;li&gt;幸运是天注定的，个人对事件的影响有限。&lt;/li&gt;
-  &lt;li&gt;小概率事件不值得期待。&lt;/li&gt;
-  &lt;li&gt;平庸的工作也需要尽全力努力。&lt;/li&gt;
+  &lt;li&gt;基本遗传算法的运行参数：&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;&lt;img src=&quot;http://images.tengblog.cn/17-7-26/59626527.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;script type=&quot;math/tex&quot;&gt;M&lt;/script&gt; ：群体大小，即群体中所含个体的数量，一般取20~100；&lt;/li&gt;
+  &lt;li&gt;&lt;script type=&quot;math/tex&quot;&gt;T&lt;/script&gt; ：遗传运算的终止进化代数，一般取100~500；&lt;/li&gt;
+  &lt;li&gt;&lt;script type=&quot;math/tex&quot;&gt;P_c&lt;/script&gt; ：交叉概率，一般取值为0.4~0.99；&lt;/li&gt;
+  &lt;li&gt;&lt;script type=&quot;math/tex&quot;&gt;P_m&lt;/script&gt; ：变异概率，一般取值为0.0001~0.1。&lt;/li&gt;
+&lt;/ul&gt;
 
-&lt;p&gt;工位窗外就是五道口，每天看着楼下的筒子楼和远处的写字楼，就生出魔幻的真实感。&lt;/p&gt;
+&lt;h2 id=&quot;伪代码描述&quot;&gt;伪代码描述&lt;/h2&gt;
 
-&lt;p&gt;因为在茶水间听到陌生的同事开始筹备订机票出门旅游，便蠢蠢欲动想着国庆出游，奋力丧了一会，想着还是把钱存起来吧。&lt;/p&gt;
+&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;Procedure&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SGA&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;begin&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;initialize&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;P&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;t&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;do&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;M&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;do&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;Evaluate&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fitness&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;of&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;P&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;M&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;do&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;Select&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;operation&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;P&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;M&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;do&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;Crossover&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;operation&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;P&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;M&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;do&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;Mutation&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;operation&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;P&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;to&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;M&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;do&lt;/span&gt;
+      &lt;span class=&quot;n&quot;&gt;P&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;P&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;t&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
 
-&lt;p&gt;现在最重要的事情就是挣钱，也许应该提前认识到这一点。&lt;/p&gt;
+&lt;h2 id=&quot;形式化定义&quot;&gt;形式化定义&lt;/h2&gt;
 
-&lt;p&gt;&lt;img src=&quot;http://images.tengblog.cn/17-7-26/21967152.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;基本遗传算法可定义为一个八元组：
+&lt;script type=&quot;math/tex&quot;&gt;SGA = (C, E, P_0, M, \Phi, \Gamma, \Psi, T)&lt;/script&gt;
+式中 &lt;script type=&quot;math/tex&quot;&gt;C&lt;/script&gt; –个体的编码方法；&lt;script type=&quot;math/tex&quot;&gt;E&lt;/script&gt; –个体适应度评价函数；&lt;script type=&quot;math/tex&quot;&gt;P_0&lt;/script&gt; –初始种群；&lt;script type=&quot;math/tex&quot;&gt;M&lt;/script&gt; –种群大小；&lt;script type=&quot;math/tex&quot;&gt;\Phi&lt;/script&gt; –选择算子；&lt;script type=&quot;math/tex&quot;&gt;\Gamma&lt;/script&gt; –交叉算子；&lt;script type=&quot;math/tex&quot;&gt;\Psi&lt;/script&gt; –变异算子；&lt;script type=&quot;math/tex&quot;&gt;T&lt;/script&gt; –运算终止条件。&lt;/p&gt;
+
+&lt;h2 id=&quot;实现&quot;&gt;实现&lt;/h2&gt;
+
+&lt;h3 id=&quot;个体适应度评价&quot;&gt;个体适应度评价&lt;/h3&gt;
+
+&lt;p&gt;在遗传算法中，以个体适应度的大小来确定该个体被遗传到下一代的概率。基本遗传算法使用比例选择算子来确定群体中各个个体遗传到下一代群体中的数量。为了正确计算不同情况下各个个体的遗传概率，要求所有的个体的适应度必须为正数或者零，不能是负数。&lt;/p&gt;
+
+&lt;p&gt;对于求目标函数最小值的优化问题，理论上只需简单地对其增加一个负号就可将其转换为目标函数最大值的优化问题，即
+&lt;script type=&quot;math/tex&quot;&gt;min  f(x) = max(-f(x))&lt;/script&gt;
+当优化目标是求函数最大值，并且目标函数总取正数时，可以直接设定个体的适应度&lt;script type=&quot;math/tex&quot;&gt;F(x)&lt;/script&gt; 就等于相应的目标函数值&lt;script type=&quot;math/tex&quot;&gt;f(x)&lt;/script&gt; ，即
+&lt;script type=&quot;math/tex&quot;&gt;F(x)=f(x)&lt;/script&gt;
+为了满足适应度取非负数的要求，基本遗传算法一般采用下面两种方法之一将目标函数值$f(x)$ 变换为个体的适应度&lt;script type=&quot;math/tex&quot;&gt;F(x)&lt;/script&gt;。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;方法一&lt;/strong&gt; 对于求目标函数最大值的优化问题，变换方法为
+&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
+F(x) = f(x) + C_{min},  f(x)+C_{min}&gt;0;
+F(x)=0,f(x)+C_{min} &lt;= 0 %]]&gt;&lt;/script&gt;
+式中，&lt;script type=&quot;math/tex&quot;&gt;C_{min}&lt;/script&gt; 为一个适当相对比较小的数，可用下面几种方法来选取。&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;预先指定的一个较小数；&lt;/li&gt;
+  &lt;li&gt;进化到当前代为止的最小目标函数值；&lt;/li&gt;
+  &lt;li&gt;当前代或者近几代群体中的最小目标函数值。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;strong&gt;方法二&lt;/strong&gt; 对于求目标函数最小值的优化问题，变换方法为
+&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
+F(x)=C_{max}-f(x),f(x)&lt;C_{max};F(x)=0,f(x)&gt;=C_{max} %]]&gt;&lt;/script&gt;
+式中，&lt;script type=&quot;math/tex&quot;&gt;C_{max}&lt;/script&gt; 为一个适当地相对比较大的数，可用下面几种方法获取：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;预先指定的一个较大的数；&lt;/li&gt;
+  &lt;li&gt;进化到当前代为止的最大目标函数值；&lt;/li&gt;
+  &lt;li&gt;当前代或者近几代群体中的最大目标函数值。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;比例选择算子&quot;&gt;比例选择算子&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;轮盘赌&lt;/strong&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;ol&gt;
+    &lt;li&gt;先计算出群体中所有个体的适应度的总和；&lt;/li&gt;
+    &lt;li&gt;其次计算出每个个体的相对适应度的大小，它即是各个个体被遗传到下一代的概率；&lt;/li&gt;
+    &lt;li&gt;最后使用模拟赌盘操作（即0~1之间的随机数）来确定各个个体被选中的次数。&lt;/li&gt;
+  &lt;/ol&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&quot;交叉算子&quot;&gt;交叉算子&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;单点交叉算子&lt;/strong&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;ol&gt;
+    &lt;li&gt;对群体中的个体进行两两随机配对；&lt;/li&gt;
+    &lt;li&gt;对每对相互配对的个体，随机设置某一基因座之后的位置为交叉点；&lt;/li&gt;
+    &lt;li&gt;对每对相互配对的个体，依设定的交叉概率在其交叉点出相互交换两个个体的部分染色体，从而产生出两个新的个体。&lt;/li&gt;
+  &lt;/ol&gt;
+&lt;/blockquote&gt;
+
+&lt;table&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;script type=&quot;math/tex&quot;&gt;A&lt;/script&gt;: 1 0 1 1 0 1 1 1&lt;/td&gt;
+      &lt;td&gt;0 0 &lt;script type=&quot;math/tex&quot;&gt;\longrightarrow&lt;/script&gt; &lt;script type=&quot;math/tex&quot;&gt;A^{\prime}&lt;/script&gt; : 1 0 1 1 0 1 1 1&lt;/td&gt;
+      &lt;td&gt;1 1&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;table&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;&lt;script type=&quot;math/tex&quot;&gt;B&lt;/script&gt;: 0 0 0 1 1 1 0 0&lt;/td&gt;
+      &lt;td&gt;1 1 &lt;script type=&quot;math/tex&quot;&gt;\longrightarrow&lt;/script&gt; &lt;script type=&quot;math/tex&quot;&gt;B^{\prime}&lt;/script&gt; : 0 0 0 1 1 1 0 0&lt;/td&gt;
+      &lt;td&gt;0 0&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h3 id=&quot;变异算子&quot;&gt;变异算子&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;基本位变异算子&lt;/strong&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;ol&gt;
+    &lt;li&gt;对个体的每一个基因座，依据变异概率指定其为变异点；&lt;/li&gt;
+    &lt;li&gt;对每个指定点，对其基因值做取反运算或用其等位基因值来替代，从而产生一个新的个体。&lt;/li&gt;
+  &lt;/ol&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;A&lt;/script&gt;: 1 0 1 1 &lt;u&gt;0&lt;/u&gt; 1 1 1  &lt;script type=&quot;math/tex&quot;&gt;\longrightarrow&lt;/script&gt; &lt;script type=&quot;math/tex&quot;&gt;A^{\prime}&lt;/script&gt; : 1 0 1 1 &lt;u&gt;1&lt;/u&gt; 1 1 1&lt;/p&gt;
+
+&lt;h3 id=&quot;具体应用&quot;&gt;具体应用&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;第一步：&lt;/strong&gt; 确定决策变量及其各种约束条件，即确定出个体的表现型和问题的解空间；&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;第二步：&lt;/strong&gt; 建立优化模型，即确定出目标函数的类型及其数学描述形式或量化方法；&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;第三步：&lt;/strong&gt; 确定表示可行解的染色体编码方法，即确定出个体的基因型及遗传算法的搜索空间；&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;第四步：&lt;/strong&gt; 确定编码方法，即确定出由个体基因型到个体表现型的对应关系或转换方法；&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;第五步：&lt;/strong&gt; 确定个体适应度的量化评价方法，即确定出由目标函数值到个体适应度的转换规则；&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;第六步：&lt;/strong&gt; 设计遗传算子，即确定出选择运算、交叉运算、变异运算等遗传算子的具体操作方法；&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;第七步：&lt;/strong&gt; 确定遗传算法的有关运行参数，即确定出遗传算法的&lt;script type=&quot;math/tex&quot;&gt;M&lt;/script&gt;, &lt;script type=&quot;math/tex&quot;&gt;T&lt;/script&gt;, &lt;script type=&quot;math/tex&quot;&gt;P_c&lt;/script&gt;, &lt;script type=&quot;math/tex&quot;&gt;P_m&lt;/script&gt; 等参数。&lt;/p&gt;
 </description>
-        <pubDate>Wed, 26 Jul 2017 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/2017/07/26/pingyong/</link>
-        <guid isPermaLink="true">http://localhost:4000/2017/07/26/pingyong/</guid>
+        <pubDate>Tue, 15 Dec 2015 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2015/12/15/GA/</link>
+        <guid isPermaLink="true">http://localhost:4000/2015/12/15/GA/</guid>
         
-        <category>感慨</category>
+        <category>GA</category>
         
-        <category>瞎扯</category>
-        
-        <category>随想录</category>
-        
-        <category>生活</category>
-        
-        
-      </item>
-    
-      <item>
-        <title>六月书单01</title>
-        <description>&lt;p&gt;从5月17日到今天，已经好久没有更新博客了。如果在放纵下去反倒就会重蹈覆辙，「及时作出调整」很重要。&lt;/p&gt;
-
-&lt;p&gt;#六月书单&lt;/p&gt;
-
-&lt;p&gt;##《赏析金庸》&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;http://images.tengblog.cn/17-6-28/93803536.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;微信公众号文章中流行一种文本，发源于六神磊磊，有什么新闻热点出现，就用金庸小说里的小说情节来类比一番。只要有一点相似，再加上一点「联想」或者是「硬掰」，一篇时事点评就能取得不少的阅读。这几乎成为不少人更号的主要样式。&lt;/p&gt;
-
-&lt;p&gt;看多了反倒把金庸小说给矮化了，《赏析金庸》这样的才是更好的了解金庸著作的方式吧。作者陈默号称是「金学家」，自然是见解要高过微信公众号的水准。可惜，在&lt;a href=&quot;https://book.douban.com/subject/26279708/&quot;&gt;豆瓣&lt;/a&gt; 反倒不少不少评价说道「全无创见」。&lt;/p&gt;
-
-&lt;p&gt;也许是觉的六神磊磊式的解读更好吧。&lt;/p&gt;
-
-&lt;h2 id=&quot;梦故乡&quot;&gt;《梦故乡》&lt;/h2&gt;
-
-&lt;p&gt;&lt;img src=&quot;http://images.tengblog.cn/17-6-28/57862435.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;这本书是选编集，超级厚，携带非常不方便。不过挺好的，是汪曾祺关于故乡的文字集合。&lt;/p&gt;
-
-&lt;p&gt;今年是汪曾祺逝世20周年，前段时间有很多纪念活动。高邮宣传部也特意选了这么本厚厚的书作为宣传吧。&lt;/p&gt;
-
-&lt;p&gt;我很喜欢汪曾祺，对他的很多作品都有很深的印象。《陈小手》《异秉》《大淖记事》等等名篇都非常喜欢。他的现代汉语尤其好，炉火纯青，再加上他自己小说风格、个人性格等等特点，大家纷纷纪念也就没什么好意外的了。&lt;/p&gt;
-
-&lt;p&gt;真的很喜欢，也大可以学习他的文字风格。&lt;/p&gt;
-
-&lt;h2 id=&quot;那些让文案绝望的文案&quot;&gt;《那些让文案绝望的文案》&lt;/h2&gt;
-
-&lt;p&gt;&lt;img src=&quot;http://images.tengblog.cn/17-6-28/57659419.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;学习用书，感觉一般&lt;/p&gt;
-
-&lt;h2 id=&quot;读库1703&quot;&gt;《读库1703》&lt;/h2&gt;
-
-&lt;p&gt;好快，都是第三本了&lt;/p&gt;
-
-</description>
-        <pubDate>Wed, 28 Jun 2017 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/2017/06/28/06books/</link>
-        <guid isPermaLink="true">http://localhost:4000/2017/06/28/06books/</guid>
-        
-        <category>读书</category>
-        
-        <category>随想录</category>
-        
-        <category>生活</category>
-        
-        
-      </item>
-    
-      <item>
-        <title>一个回威海的周末</title>
-        <description>&lt;p&gt;在度过了昂贵且浪费的周六郊外烧烤后，我在周末的清晨登上了飞往威海的飞机。刚刚八点就到了威海，比平常起床的时候还早了一些。想想睡觉真是浪费了不少时间啊。&lt;/p&gt;
-
-&lt;p&gt;五月的威海最好了，天气微凉，但是又不觉会着凉，天气晴朗，是赶超北京峰会蓝的。坐在机场大巴上感觉这个小城市还是那么亲切。&lt;/p&gt;
-
-&lt;p&gt;路过威高广场，我下车想去吃的东西，反而周末的商场还没有开门。即便是等了好一会也还是没有开门。找了摩拜单车就向学校骑去，有点后悔，干嘛要提前下车。&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;&lt;img src=&quot;http://images.tengblog.cn/17-5-16/52397371-file_1494944228673_67c6.gif&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;回去看了学校，看了老师，看了同学，去了海边，没什么想说的了。&lt;/p&gt;
-
-&lt;p&gt;应该早和老师多多联系，也许会省去很多烦恼或者处理更多的事情。&lt;/p&gt;
-
-&lt;p&gt;结婚的同学很幸福又有点焦虑的样子和我们一样，祝他们幸福。&lt;/p&gt;
-
-&lt;p&gt;在学校拍毕业照的人们，很幸福，我没有拍毕业照，还是很羡慕的。&lt;/p&gt;
-
-</description>
-        <pubDate>Wed, 17 May 2017 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/2017/05/17/fanxiao/</link>
-        <guid isPermaLink="true">http://localhost:4000/2017/05/17/fanxiao/</guid>
-        
-        <category>瞎扯</category>
-        
-        <category>随想录</category>
-        
-        <category>生活</category>
-        
-        
-      </item>
-    
-      <item>
-        <title>春夏之交的北京</title>
-        <description>&lt;p&gt;五月才是北京最好的时间，比秋天的北京更好。&lt;/p&gt;
-
-&lt;p&gt;五月，天气逐渐热了，春风变得燥起来，又有一点凉意，吹起来很舒服。更妙的是，气温刚刚好，夏服上市，姑娘换了裙子，小伙换了短 T，太阳也没有那么毒。&lt;/p&gt;
-
-&lt;p&gt;路边停满了共享单车，五颜六色的，也装饰了路上的风景。找一辆在路上闲逛，风一吹，感觉确实感觉好极了。白昼也变得更长了，原本6点就尽黑的天色到了七天还是可以看见路边乘凉的市民。乘凉的，在路边疾走健身的，路边嬉戏打闹的，还有练习滑板的孩子，慢慢的生活气息。&lt;/p&gt;
-
-&lt;p&gt;共享单车正是最好的时候，熬过了冬天，越来越多颜色的车出现在街头。不管是暴走不断游客，还是小区里打闹的孩子都随手开辆，节省了不少的力气。热门景区也堆满了各色的自行车，长安街上实现了自行车共产。&lt;/p&gt;
-
-&lt;p&gt;因为五月太好了，景区的人也多了很多，很多。4月最后的一天和同学去体验京城观光公交，做了三个小时的车就赶紧跑去吃饭了。在盖老师夸张的虚张声势下，无限地提高了对藏在胡同里的料理店的期望。&lt;/p&gt;
-
-&lt;p&gt;料理挺好的，也远远没有够到原本的心理预算，好在大家都挺开心的，还在前门的商业街上来回走了两趟，也是一起浏览了北京城。&lt;/p&gt;
-
-&lt;p&gt;其他的日就是在屋里对着runningMan 的直播傻笑，实在觉得浪费外面的好天气，就去附近的影院看电影。摩拜单车，十分钟就到。&lt;/p&gt;
-
-&lt;p&gt;三天看了「年轻气盛」「喜欢你」「志明和春娇」「五十度黑」「记忆大师」，中间还和艳伟同学去看了资料馆的「你好，疯子」「乘风破浪」，这样的节奏有点像当初一个人跑去曼谷市中心看电影的样子。&lt;/p&gt;
-
-&lt;p&gt;五月也是大型「邪教」组织可是活动的时候，朋友圈开始了他们的集会场面，微博上开始流传篡改的「你是人间五月天」。&lt;/p&gt;
-
-&lt;p&gt;真好，五月真的挺不错的。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;http://images.tengblog.cn/17-5-1/58926488-file_1493644302682_17e9d.gif&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;by 我自己&lt;/p&gt;
-
-</description>
-        <pubDate>Mon, 01 May 2017 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/2017/05/01/wuyue/</link>
-        <guid isPermaLink="true">http://localhost:4000/2017/05/01/wuyue/</guid>
-        
-        <category>瞎扯</category>
-        
-        <category>随想录</category>
-        
-        <category>生活</category>
-        
-        
-      </item>
-    
-      <item>
-        <title>生活中的变和不变</title>
-        <description>&lt;p&gt;周六一天休息，明天要去上班，很多事情要加速处理起来。&lt;/p&gt;
-
-&lt;p&gt;这大概是新工作的必然，其实也没什么好意外的，上次在这家公司的时候就已经领教过了。好处就是：现在的工作至少是有价值的，有收益的，也是有发展的。相比之下，再要求其他充分的休息当然是不不现实的。&lt;/p&gt;
-
-&lt;p&gt;也不是最求悠闲生活的时候。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;迅速地成长起来，实现个人价值的增值是最重要的。&lt;/strong&gt;过去浪费太多时间了，原本成长的时候浪费了很多时间。这真实个遗憾，&lt;strong&gt;在每天耗时最长的工作上抱枕自己的快速成长&lt;/strong&gt;，坚持贯彻这个吧。任何工作都有巨大的空间等待着每个职场新人的成长，如果实在觉得收获有限，你需要换个工作。&lt;strong&gt;越快越好&lt;/strong&gt;这也是一个原则，不过目前不需要了。&lt;/p&gt;
-
-&lt;p&gt;工作重新变得繁忙起来，这自然是生活的正常变化。带来的蝴蝶效应就是：搬家了，搬到了北三环，靠近人大、公司、海淀黄庄的繁华所在，房租自然也是水涨船高，更大的损失在原来房子的转租不力。&lt;/p&gt;
-
-&lt;p&gt;没什么积蓄倒是倒贴了不少。每次都能体会荒野求生游戏的艰难。改变的还有专业极致的同事，倒是可以体会在迅速发展公司行业的人专业性是怎么样的，差距是巨大的。&lt;/p&gt;
-
-&lt;p&gt;自然有些东西一时半会是改变不了的。&lt;/p&gt;
-
-&lt;p&gt;冷漠的城市总是给人孤独的感觉，换工作的时候更是这样。你我都是一颗小小的螺丝钉，少了谁都不会缺少什么。大分工让人和人之间的冷漠变得随处可见，现在想想离职前请打大家吃饭也是多此一举，浪费金钱和感情罢了，那么大的城市，再见是缘分，不见就不见吧。&lt;/p&gt;
-
-&lt;p&gt;即便是来自家乡的高中同学，其实也没多少了解了。我是有心和同学多多交流，却最容易落个自作多情，徒增烦恼。&lt;/p&gt;
-
-&lt;p&gt;周六，约了一个大概七年没见的同学去看电影了。七年没见，想想真是可怕，明明都在一个小城而已，相距不过千米的小区。&lt;/p&gt;
-
-&lt;p&gt;好在多年未见，反倒让相近的价值观和工作经历打破了隔阂，没什么障碍。看了速度和激情，一个不断提家人的电影，这实在是心酸。&lt;/p&gt;
-
-&lt;p&gt;我说，珍惜现在身边的人，每次都会最后一次见面。倘若是遥向祝福倒是善终，不欢而散只会凸显旧时光的可惜。&lt;/p&gt;
-
-&lt;p&gt;不过，这也和人有关系，有的人大概永远不会珍惜你付出的时间，有求于你自然是索求不止，不需要的时候微信点赞也是不曾有过。即便是再有好感的旧时同学也会把这情谊耗尽。&lt;/p&gt;
-
-&lt;p&gt;生活啊，还是积极起来啊。&lt;/p&gt;
-
-&lt;p&gt;毕竟夏天要来了，路上的姑娘穿起了裙子，和煦的风吹起来，让人想在路边享受按摩和烤串。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;http://images.tengblog.cn/17-4-15/56878506-file_1492265252552_17541.gif&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;图by一闪沙飞&lt;/p&gt;
-</description>
-        <pubDate>Sat, 15 Apr 2017 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/2017/04/15/shenghuo/</link>
-        <guid isPermaLink="true">http://localhost:4000/2017/04/15/shenghuo/</guid>
-        
-        <category>瞎扯</category>
-        
-        <category>随想录</category>
-        
-        
-      </item>
-    
-      <item>
-        <title>我只是有点忙而已</title>
-        <description>&lt;p&gt;&lt;img src=&quot;http://images.tengblog.cn/17-4-9/56568045-file_1491747900929_14932.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;给大家寄了明信片，因为不知道寄给谁，所以看了下谁给我朋友圈点赞，然后写给了他们，给本旭、小胖、斯微寄了，寄给自己的收到了，寄给你们的不知道能不能收到，随缘吧~&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;&lt;img src=&quot;http://images.tengblog.cn/17-4-9/53326036-file_1491747728790_79fb.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;&lt;img src=&quot;http://images.tengblog.cn/17-4-9/17435937-file_1491747728923_941a.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;&lt;img src=&quot;http://images.tengblog.cn/17-4-9/52425793-file_1491747652608_2423.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-</description>
-        <pubDate>Sun, 09 Apr 2017 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/2017/04/09/mang/</link>
-        <guid isPermaLink="true">http://localhost:4000/2017/04/09/mang/</guid>
-        
-        <category>瞎扯</category>
-        
-        <category>随想录</category>
-        
-        
-      </item>
-    
-      <item>
-        <title>你永远无法战胜两种人：HR</title>
-        <description>&lt;p&gt;原则上，很多事情可以通过有效学习实现对事情的精进，战胜一个个困难的，很多人也是这样，你可以通过学习、练习实现对另个人的超越。我也是深信这样的原则。&lt;/p&gt;
-
-&lt;p&gt;不过，我也深刻地体会到：「有两种人，你是永远没法战胜的，一种就是人力。」&lt;/p&gt;
-
-&lt;p&gt;人力来对职场人士来说简直是「大规模杀伤性武器」，正常的员工是不想和人力产生关联的。可是一个职场人士再小心避免接触人力也无法避免的要和人力打交道两次：面试、离职。&lt;/p&gt;
-
-&lt;p&gt;这仅有的两次接触，人力就向你展示了他们的杀伤性。&lt;/p&gt;
-
-&lt;h3 id=&quot;面试&quot;&gt;面试&lt;/h3&gt;
-
-&lt;p&gt;面试简直就是一场厮杀。人力全面审视着你，然后给你一个他认为合适的薪资，除非是boss 特点的高管，其他职场人士难免会在时候产生对自己的怀疑：也许我就值这些钱吧。心智不坚定的人被一点拖延就拿的稳稳，成为人力定薪的刀下鬼。&lt;/p&gt;
-
-&lt;h3 id=&quot;离职&quot;&gt;离职&lt;/h3&gt;
-
-&lt;p&gt;离职就更是如此。在完成了「肯蒙拐骗」的骗你入职以后，人力在离职的时候就完全成为了霸道总裁。为了一纸离职证明，要忍受不少痛苦的环节，多年积累的对公司的好感在这一刻就会被摧毁。&lt;/p&gt;
-
-&lt;h3 id=&quot;破解之道&quot;&gt;破解之道&lt;/h3&gt;
-
-&lt;p&gt;在经历了不同人力主导的定薪和离职的环节后，我想到一招破解人力的妙招。&lt;/p&gt;
-
-&lt;p&gt;这一招好用，简单，不过也需要你自身实力过硬，脸皮够厚，更重要的是不要害怕会参与撕逼，它就是记住：&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;我是一个不重要的人~&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;&lt;strong&gt;面试定薪&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;我并不那么重要，对公司的面试也就多了几分淡然，面试的发挥除了更好，还能彰显出一股谦虚敬慎的气质。进入定薪环节，牢记&lt;strong&gt;我不重要&lt;/strong&gt;也可以让你不至于产生过高的期望，感觉自己一定会被期望薪资招录。&lt;/p&gt;
-
-&lt;p&gt;更要记住的是，我对贵司不重要，贵司对我也绝非非你不可。淡然的选择反而会对自己的价值有更加持久的坚持。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;离职&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;离职跳槽的时候，&lt;strong&gt;我不重要&lt;/strong&gt;的金科玉律更是好用。&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;多年感情不想离职？
-同事和睦不想离职？
-公司对你不薄不想离职？&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;不好意思，你并不重要。看，离职的喜庆立马坚定了吧。好了好了，重要要离职了，感觉和同事聚下一叙衷情？&lt;/p&gt;
-
-&lt;p&gt;别别，&lt;strong&gt;你不重要&lt;/strong&gt;，还剩了一笔聚餐会呢。&lt;/p&gt;
-
-&lt;p&gt;看吧，装换心态就是这么简单的解决了无所谓的困扰。推广出来，这条在生活上也是一招秘术呢。&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;你也不用考虑被人对你的看法，因为我不重要啊，干嘛要上赶着沟通什么感情？
-别人找你帮忙？不好意思拒绝？完全拒绝就好了啊，因为我不重要啊，人家面试完了一家踢开你都没问题哦。牢记这条就不会给他们机会了。
-自作多情，代入故事。得了吧，我不重要。别人不会为你操心，我也就不要为别人的操心而操心了。看，省了两个逻辑循环，节约了多少能量啊。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;这大概是最实用的一条原则了：&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;我并不重要，我的脸面也不重要，我的错误也不重要。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;我们还有更多更重要的事情要关心，这些就算了吧。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;http://images.tengblog.cn/17-3-26/76403149-file_1490529185502_7877.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-</description>
-        <pubDate>Wed, 29 Mar 2017 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/2017/03/29/HR/</link>
-        <guid isPermaLink="true">http://localhost:4000/2017/03/29/HR/</guid>
-        
-        <category>瞎扯</category>
-        
-        <category>随想录</category>
-        
-        <category>职场</category>
-        
-        <category>原则</category>
-        
-        
-      </item>
-    
-      <item>
-        <title>读库1702</title>
-        <description>&lt;h1 id=&quot;读后&quot;&gt;读后&lt;/h1&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;周末上课的，没有课本的我只带了一本《读库1703》。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;很喜欢里面的一篇《星象学的预测准吗？》，当然不准。一直想写下星座的伪科学性，其实星象学流行的时候科学都没出现呢，也无从说起「伪」。不过文章倒是说出了人们相信预测的原因，「对不确定的不全全感」；也让我对星象学宽容了起来，这不过是流行文化，就和讨论明星八卦没什么差别，以此为据没有必要，见则抨击也没什么必要。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;《接吻和革命》则是对我们现在的生活很有启发意义：&lt;strong&gt;不要妄想会有宽松的审查，不要痴人说梦&lt;/strong&gt;。这项活动不会因为国家的意识形态、文明发展有什么不同，只要有权力机构，审查就不会消失。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;长篇文章，几句所得也是收获，摘录。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;&lt;img src=&quot;http://images.tengblog.cn/17-3-19/3099913-file_1489894595805_14ce2.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;胡思&quot;&gt;胡思&lt;/h2&gt;
-
-&lt;p&gt;「应该珍惜和每个人每一次见面的机会，就当这是最后的见面。」&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;&lt;img src=&quot;http://images.tengblog.cn/17-3-19/25522353-file_1489894596082_155ab.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;星象学的预测准吗&quot;&gt;星象学的预测准吗？&lt;/h2&gt;
-
-&lt;p&gt;「很多人的心底都有一种欲望，希望在浩瀚的宇宙中为自己的存在找到归宿，预知未来的生命历程。这种意愿为星象占卜提供了经久不衰的市场需求。」&lt;/p&gt;
-
-&lt;p&gt;「和大多数文化产品一样，星象星座的作用是表达情感和抚慰心灵，而不是伸张理性智识」&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;&lt;img src=&quot;http://images.tengblog.cn/17-3-19/1769863-file_1489894595131_1309e.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;接吻和革命&quot;&gt;接吻和革命&lt;/h2&gt;
-
-&lt;p&gt;「看到这种宽松的趋势，日本电影人纷纷欢呼自由的时代来了，然而，无情的现实却是当头一棒，对影片的审查和管制仍旧存在，为所欲为依然是不可能的。」&lt;/p&gt;
-</description>
-        <pubDate>Sat, 11 Mar 2017 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/2017/03/11/duku1703/</link>
-        <guid isPermaLink="true">http://localhost:4000/2017/03/11/duku1703/</guid>
-        
-        <category>读书</category>
-        
-        <category>笔记</category>
-        
-        <category>正经</category>
-        
-        <category>学习</category>
-        
-        
-      </item>
-    
-      <item>
-        <title>文学的阅读能力</title>
-        <description>&lt;h2 id=&quot;文学的阅读能力&quot;&gt;文学的阅读能力&lt;/h2&gt;
-
-&lt;p&gt;&lt;img src=&quot;http://images.tengblog.cn/17-3-10/84183703-file_1489112090685_3096.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;什么叫做写作能力？说到底，就是学习阅读。你读明白了，你自然就写出来了。阅读能力越强，写作的能力就越强。&lt;/p&gt;
-
-  &lt;p&gt;所以，我说，阅读是需要才华的，阅读的才华就是写作的才华。&lt;/p&gt;
-
-  &lt;p&gt;—毕飞宇&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;我以前就觉得很多人是没有阅读能力的，阅读不了说明类的文章。作者明明在文章里面清清楚楚写了怎么操作，怎么按照步骤来作，下面的评论还是会有人问：“入口在哪？”&lt;/p&gt;
-
-&lt;p&gt;「一字不差地阅读」虽然是个说的很烂的话题，不过90%的人还是没有这个能力的，我自己也没有。&lt;/p&gt;
-
-&lt;p&gt;阅读能力，应该是每个孩子在孩提时要学习的最重要的能力，如果实在没有就自己慢慢培养下。&lt;/p&gt;
-
-&lt;p&gt;《小说课》（毕飞宇）是一本用别人阅读能力带领你阅读的讲座集，很推荐没有文学阅读能力的人来看看。&lt;/p&gt;
-
-&lt;p&gt;作家毕飞宇是当代著名的小说家，跟随小说家的脚步去阅读经典名篇，我们能看到会更多，比如说他对《受戒》的解读，对海明威《杀手》的解读。&lt;/p&gt;
-
-&lt;p&gt;我一直很喜欢汪曾祺，也看过他的大部分短篇小说，不过看完毕飞宇《倾庙之恋》对《受戒》的解读之后，最大的体会就是那么多的作品，我都没读懂。单纯地只是对汪曾祺小说的泛泛翻阅，不是我不求甚解，可能是我没有仔细研读的能力。&lt;/p&gt;
-
-&lt;p&gt;不过，文学解读最容易被人诟病的是「过度解读」，也成了很多人攻击语文课上「阅读理解」的借口。&lt;/p&gt;
-
-&lt;p&gt;看看毕飞宇是怎么说的：&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;小说是公器。阅读小说和研究小说从来不是为了印证作者，相反，好作品的价值在激励想想，在激励认知。仅仅从这个意义上说，接触的文本是大于作家的。&lt;/p&gt;
-
-  &lt;p&gt;读者的阅读超越了作家，是读者的福，更是作者的福。只有少数的读者和更加少数的作者可以享受这样的福。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;作者在写作文本的时候，其实直觉性的，他自己也许没有想到那么多，因为这些是潜移默化在他的脑海中的，只是借助他的笔触写了出来。说「文章本天成，妙手偶得之」，作者不过是个幸运儿。&lt;/p&gt;
-
-&lt;p&gt;想做个更幸运的读者，也许多多思考下文本背后的东西才行。再不济也可以借小说家的眼来读其他作品。&lt;/p&gt;
-</description>
-        <pubDate>Fri, 10 Mar 2017 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/2017/03/10/xiaoshuoke/</link>
-        <guid isPermaLink="true">http://localhost:4000/2017/03/10/xiaoshuoke/</guid>
-        
-        <category>读书</category>
-        
-        <category>笔记</category>
-        
-        <category>正经</category>
-        
-        <category>学习</category>
+        <category>Algorithm</category>
         
         
       </item>

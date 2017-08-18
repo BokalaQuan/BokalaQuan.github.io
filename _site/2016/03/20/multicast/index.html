@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keywords"  content="">
+    <meta name="theme-color" content="#000000">
+    
+    <title>组播技术简介 - 权文明的博客 | Bokala Blog</title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="http://localhost:4000/2016/03/20/multicast/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Bokala Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/aboutme/"> about</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/archives/">Archives</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/tags/">Tags</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    var __HuxNav__ = {
+        close: function(){
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        },
+        open: function(){
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+
+    // Bind Event
+    $toggle.addEventListener('click', function(e){
+        if ($navbar.className.indexOf('in') > 0) {
+            __HuxNav__.close()
+        }else{
+            __HuxNav__.open()
+        }
+    })
+
+    /**
+     * Since Fastclick is used to delegate 'touchstart' globally
+     * to hack 300ms delay in iOS by performing a fake 'click',
+     * Using 'e.stopPropagation' to stop 'touchstart' event from 
+     * $toggle/$collapse will break global delegation.
+     * 
+     * Instead, we use a 'e.target' filter to prevent handler
+     * added to document close HuxNav.  
+     *
+     * Also, we use 'click' instead of 'touchstart' as compromise
+     */
+    document.addEventListener('click', function(e){
+        if(e.target == $toggle) return;
+        if(e.target.className == 'icon-bar') return;
+        __HuxNav__.close();
+    })
+</script>
+
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/home-bg.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/home-bg.jpg')
+    }
+
+    
+</style>
+<header class="intro-header" >
+    <div class="header-mask"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/#Multicast" title="Multicast">Multicast</a>
+                        
+                        <a class="tag" href="/tags/#Computer Network" title="Computer Network">Computer Network</a>
+                        
+                    </div>
+                    <h1>组播技术简介</h1>
+                    
+                    
+                    <h2 class="subheading">介绍组播的产生背景、组播传输机制和相关协议</h2>
+                    
+                    <span class="meta">Posted by Bokala on March 20, 2016</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+				<h1 id="产生背景">产生背景</h1>
+
+<p>传统的IP通信方式主要有单播及广播两种方式。</p>
+
+<p><strong>单播：</strong> 在源主机与目的主机之间的点对点通信；</p>
+
+<p><strong>广播：</strong> 在源主机与同一网段中所有其他主机之间点对多点的通信。</p>
+
+<p><strong>缺点：</strong> 欲要将信息发送给多个主机而非所有主机，若采用广播的方式，不仅会将信息发送给不需要的主机而浪费资源，而且也不能够实现跨网段发送；若采用单播的方式，重复的IP包不仅会占用大量带宽，而且会增加源主机的负载。</p>
+
+<p><strong>组播：</strong> 指在IP网络中，将数据包以尽力传送的形式发送给某个确定的节点集合（即组播组），其基本思想是：源主机（组播源）只发送一份数据，其目的地址为组播组地址，组播组中的所有接受者都可收到同样的数据拷贝，并且只有组播组内的主机可以接收该数据包，其他主机则不能接收。</p>
+
+<h1 id="技术优点">技术优点</h1>
+
+<p>有效地解决了单点发送、多点接收的问题，实现了IP网络中点到多点的高效数据传送，能节约大量的网络带宽、降低网络负载。网络的组播特性可以提供更加丰富的业务，如在线直播、网络电视、远程教育、网络电台、实时视频会议等信息服务。</p>
+
+<h1 id="实现">实现</h1>
+
+<ul>
+  <li>组播源向一组确定的接受者发送信息，如何来标识这组确定的接受者？–<a href="">组播地址机制</a></li>
+  <li>接收者通过加入组播组来实现对组播信息的接收，接收者是如何动态地加入或离开组播组的？ –<a href="">组成员关系管理</a></li>
+  <li>组播报文在网络中是如何被转发并最终到达接受者的？–<a href="">组播报文转发</a></li>
+  <li>组播报文的转发路径（组播转发树）是如何构建的？–<a href="">组播路由协议</a></li>
+</ul>
+
+<h2 id="1-组播地址机制">1. 组播地址机制</h2>
+
+<h3 id="11-ip组播地址">1.1 IP组播地址</h3>
+
+<p><img src="http://ouqpou19v.bkt.clouddn.com/%E7%BB%84%E6%92%AD%E5%9C%B0%E5%9D%80%E6%A0%BC%E5%BC%8F.png" alt="组播地址格式" /></p>
+
+<p>IP组播地址用于标识一个IP组播组，D类地址空间之分配给组播使用的，范围是224.0.0.0~239.255.255。</p>
+
+<p><img src="http://ouqpou19v.bkt.clouddn.com/IP%E7%BB%84%E6%92%AD%E5%9C%B0%E5%9D%80%E5%88%92%E5%88%86.png" alt="IP组播地址划分" /></p>
+
+<h3 id="12-ip组播地址到链路层的映射">1.2 IP组播地址到链路层的映射</h3>
+
+<p><img src="http://ouqpou19v.bkt.clouddn.com/IP%E7%BB%84%E6%92%AD%E5%9C%B0%E5%9D%80%E5%88%B0%E7%BB%84%E6%92%ADMAC%E5%9C%B0%E5%9D%80%E7%9A%84%E6%98%A0%E5%B0%84.png" alt="IP组播地址到组播MAC地址的映射" /></p>
+
+<p>IANA将MAC地址范围01:00:5E:00:00:00～01:00:5E:7F:FF:FF分配给组播使用，这就要求将28位的IP组播地址空间映射到23位的组播MAC地址空间中，具体的映射方法是将组播地址中的低23位放入MAC地址的低23位 。由于IP组播地址的后28位中只有23位被映射到组播MAC地址，这样会有32个IP组播地址映射到同一组播MAC地址上。</p>
+
+<h2 id="2-组成员关系管理">2. 组成员关系管理</h2>
+
+<p>组成员关系管理是指在路由器/交换机上建立直联网段内的组成员关系信息，具体就是各接口/端口下有哪些组播组的成员。</p>
+
+<h3 id="21-igmp">2.1 IGMP</h3>
+
+<p><strong>IGMP</strong>运行于主机和与主机直连的路由器之间，其实现的功能是双向的：一方面，主机通过<strong>IGMP</strong>通知路由器希望接收某个特定组播组的信息；另一方面，路由器通过<strong>IGMP</strong>周期性地查询局域网内的组播组成员是否处于活动状态，实现所连网段组成员关系的收集与维护。通过<strong>IGMP</strong>，在路由器中记录的信息是某个组播组是否在本地有组成员，而不是组播组与主机之间的对应关系。</p>
+
+<p>目前共有三个版本的IGMP：</p>
+
+<ul>
+  <li><strong>IGMPv1</strong>(RFC 1112)中定义了基本的组成员查询和报告过程；</li>
+  <li><strong>IGMPv2</strong>(RFC 2236)在 <strong>IGMPv1</strong> 的基础上添加了组成员快速离开的机制等；</li>
+  <li><strong>IGMPv3</strong>(RFC 3376)中增加的主要功能是成员可以指定接收或拒绝来自某些组播源的报文，以实现对 <strong>SSM</strong> 模型的支持。</li>
+</ul>
+
+<p>下面是<strong>IGMPv2</strong>的工作原理图：</p>
+
+<p><img src="http://ouqpou19v.bkt.clouddn.com/IGMPV2%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86.PNG" alt="IGMPV2工作原理" /></p>
+
+<blockquote>
+  <p>当同一个网段内有多个IGMP路由器时， IGMPv2通过查询器选举机制从中选举出唯一的查询器。查询器周期性地发送普遍组查询消息进行成员关系查询，主机通过发送报告消息来响应查询。而作为组成员的路由器，其行为也与普通主机一样，响应其它路由器的查询。</p>
+
+  <p>当主机要加入组播组时，不必等待查询消息，而是主动发送报告消息；当主机要离开组播组时，也会主动发送离开组消息，查询器收到离开组消息后，会发送特定组 查询消息来确定该组的所有组成员是否都已离开。</p>
+</blockquote>
+
+<p>通过上述机制，在路由器里建立起一张表，其中记录了路由器各接口所对应子网上都有哪些组的成员。当路由器收到发往组G的组播数据后，只向那些有G的成员的接口转发该数据。至于组播数据在路由器之间如何转发则由组播路由协议决定，而不是IGMP的功能。</p>
+
+<h3 id="22-igmp-snooping">2.2 IGMP Snooping</h3>
+
+<p><strong>IGMP</strong>是针对IP层设计的，只能记录路由器上的三层接口与IP组播地址的对应关系。但在很多情况下，组播报文不可避免地要经过一些交换机，如果没有一种机制将二层端口与组播MAC地址对应起来，组播报文就会转发给交换机的所有端口，这显然会浪费大量的系统资源。</p>
+
+<p><strong>IGMP Snooping</strong>的出现就可以解决这个问题，其工作原理为：主机发往<strong>IGMP</strong>查询器的报告消息经过交换机时，交换机对这个消息进行监听并记录下来，为端口和组播MAC地址建立起映射关系；当交换机收到组播数据时，根据这样的映射关系，只向连有组成员的端口转发组播数据。</p>
+
+<h2 id="3-组播报文转发">3. 组播报文转发</h2>
+
+<h3 id="31-组播转发树">3.1 组播转发树</h3>
+
+<p>组播报文在网络中是沿着树型转发路径进行转发的，该路径称为组播转发树，可分为源树和共享树两类。</p>
+
+<p><strong>源树：</strong> 指以组播源作为树根，将组播源到每个接受者的最短路径结合起来构成的转发树，源树也称为最短路径树(SRT)。</p>
+
+<p>源树的优点是能构造组播源和接收者之间的最短路径，使端到端的延迟达到最小。但付出的代价是，在路由器中必须为每个组播源保存路由信息，这样会占用大量的系统资源，路由表的规模也比较大。</p>
+
+<p><strong>共享树：</strong> 以某个路由器作为路由树的树根，该路由器称为汇集点（RP），共享树就是由RP到所有接收者的最短路路径所共同构成的转发树。使用共享树时，对应某个组网络中只有一棵树。所有的组播源和接收者都使用这棵树来收发报文，组播源先向树根发送数据报文，之后报文又向下转发到达所有的接收者。</p>
+
+<p>共享树的最大优点是路由器中保留的路由信息可以很少，缺点是组播源发出的报文要先经过RP，再到达接收者，经由的路径通常并非最短，而且对RP的可靠性和处理能力要求很高。</p>
+
+<h3 id="32-组播报文转发机制">3.2 组播报文转发机制</h3>
+
+<p>当路由器收到组播数据报文时，根据组播目的地址查找组播转发表，对报文进行转发。与单播报文的转发相比，组播报文的转发相对复杂：在单播报文的转发过程中，路由器并不关心报文的源地址，只关心报文的目的地址，通过其目的地址决定向哪个接口转发；而组播报文是发送给一组接收者的，这些接收者用一个逻辑地址（即组播地址）标识，路由器在收到组播报文后，必须根据报文的源地址确定其正确的入接口（指向组播源方向）和下游方向，然后将其沿着远离组播源的下游方向转发——这个过程称为逆向路径转发（RPF）。</p>
+
+<p>在RPF执行过程中会利用原有的单播路由表确定上、下游的邻接节点，只有报文从上游节点所对应的接口（称为RPF接口，即路由器上通过单播方式向该地址发送报文的出接口）到达时，才向下游转发。 RPF的主体是RPF检查，通过RPF检查除了可以正确地按照组播路由的配置转发报文外，还可以避免可能出现的环路。路由器收到组播报文后先对其进行RPF检查，只有检查通过才执行转发。</p>
+
+<p>RPF检查的过程为：路由器在单播路由表中查找组播源或RP对应的RPF接口（使用SPT时查找组播源对应的RPF接口，使用RPT时查找RP对应的RPF接口），如果组播报文是从RPF接口接收下来的，则RPF检查通过，报文向下游接口转发；否则，丢弃该报文。</p>
+
+<h2 id="4-组播路由协议">4. 组播路由协议</h2>
+
+<ul>
+  <li>域内组播路由协议：根据 IGMP 协议维护的组成员关系信息，运用一定的组播路由算法构造组播分发树，在路由器中建立组播路由状态，路由器根据这些状态进行组播数据包转发；</li>
+  <li>域间组播路由协议：根据网络中配置的域间组播路由策略，在各自治系统间发布具有组播能力的路由信息以及组播源信息，使组播数据能在域间进行转发。</li>
+</ul>
+
+<h2 id="5-组播模型分类">5. 组播模型分类</h2>
+
+<ul>
+  <li><strong>ASM</strong>模型：即任意源组播模型。在 ASM 模型中，任一发送者都可作为组播源向某组播组地址发送组播信息，接收者通过加入由该组播组地址标识的组播组以获得发往该组播组的组播信息。在 ASM 模型中，接收者无法预先知道组播源的位置，但可以在任意时间加入或离开组播组。</li>
+  <li><strong>SSM</strong>模型：即指定信源组播模型。在现实生活中，用户可能只对某些组播源发送的组播信息感兴趣，而不愿接收其它源发送的信息。 SSM 模型为用户提供了一种能够在客户端指定组播源的传输服务。</li>
+</ul>
+
+<!-- zanshang -->
+<div>
+  
+
+
+      
+    </div>
+                <hr>
+
+                
+
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2015/12/15/GA/" data-toggle="tooltip" data-placement="top" title="遗传算法简述">
+                        Previous<br>
+                        <span>遗传算法简述</span>
+                        </a>
+                    </li>
+                    
+                    
+                </ul>
+
+
+                
+
+                
+
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+        			</div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("http://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    <li>
+                        <a href="/feed.xml">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+ 					 <!--
+                    
+                    -->
+
+                    <!-- add lofter,ins by teng, add target = "_blank" to <a> by Hux -->
+                    
+                    
+                    
+
+                     
+
+                     <!-- add lofter,ins by teng, add target = "_blank" to <a> by Hux -->
+                    
+
+                       
+
+                    <!-- add Weibo, Zhihu by Hux, add target = "_blank" to <a> by Hux -->
+                    
+                    
+                    <li>
+                        <a target="_blank" href="http://weibo.com/Wainamoinen">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+
+
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/BokalaQuan">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+
+                  </ul>
+                  <p class="copyright text-muted">
+                      Copyright &copy; Bokala Blog 2017
+                      <br>
+                      Write by <a href="http://weibo.com/yanchufei">Teng</a> | 对世界保持学习力
+
+                  </p>
+              </div>
+          </div>
+      </div>
+
+
+  </footer>
+  <!-- jQuery -->
+  <script src="/js/jquery.min.js "></script>
+
+  <!-- Bootstrap Core JavaScript -->
+  <script src="/js/bootstrap.min.js "></script>
+
+  <!-- Custom Theme JavaScript -->
+  <script src="/js/hux-blog.min.js "></script>
+
+
+  <!-- async load function -->
+  <script>
+      function async(u, c) {
+        var d = document, t = 'script',
+            o = d.createElement(t),
+            s = d.getElementsByTagName(t)[0];
+        o.src = u;
+        if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+        s.parentNode.insertBefore(o, s);
+      }
+  </script>
+
+  <!--
+       Because of the native support for backtick-style fenced code blocks
+       right within the Markdown is landed in Github Pages,
+       From V1.6, There is no need for Highlight.js,
+       so Huxblog drops it officially.
+       - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0
+       - https://help.github.com/articles/creating-and-highlighting-code-blocks/
+       - https://github.com/jneen/rouge/wiki/list-of-supported-languages-and-lexers
+  -->
+  <!--
+      <script>
+          async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+              hljs.initHighlightingOnLoad();
+          })
+      </script>
+      <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+  -->
+
+
+  <!-- jquery.tagcloud.js -->
+  <script>
+      // only load tagcloud.js in tag.html
+      if($('#tag_cloud').length !== 0){
+          async('/js/jquery.tagcloud.js',function(){
+              $.fn.tagcloud.defaults = {
+                  //size: {start: 1, end: 1, unit: 'em'},
+                  color: {start: '#bbbbee', end: '#0085a1'},
+              };
+              $('#tag_cloud a').tagcloud();
+          })
+      }
+  </script>
+
+  <!--fastClick.js -->
+  <script>
+      async("http://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+          var $nav = document.querySelector("nav");
+          if($nav) FastClick.attach($nav);
+      })
+  </script>
+
+
+  <!-- Google Analytics -->
+  
+
+
+  <!-- Baidu Tongji -->
+  
+
+
+
+  <!-- Side Catalog -->
+  
+  <script type="text/javascript">
+      function generateCatalog (selector) {
+          var P = $('div.post-container'),a,n,t,l,i,c;
+          a = P.find('h1,h2,h3,h4,h5,h6');
+          a.each(function () {
+              n = $(this).prop('tagName').toLowerCase();
+              i = "#"+$(this).prop('id');
+              t = $(this).text();
+              c = $('<a href="'+i+'" rel="nofollow">'+t+'</a>');
+              l = $('<li class="'+n+'_nav"></li>').append(c);
+              $(selector).append(l);
+          });
+          return true;
+      }
+      generateCatalog(".catalog-body");
+      // toggle side catalog
+      $(".catalog-toggle").click((function(e){
+          e.preventDefault();
+          $('.side-catalog').toggleClass("fold")
+      }))
+      /*
+       * Doc: https://github.com/davist11/jQuery-One-Page-Nav
+       * Fork by Hux to support padding
+       */
+      async("/js/jquery.nav.js", function () {
+          $('.catalog-body').onePageNav({
+              currentClass: "active",
+              changeHash: !1,
+              easing: "swing",
+              filter: "",
+              scrollSpeed: 700,
+              scrollOffset: 0,
+              scrollThreshold: .2,
+              begin: null,
+              end: null,
+              scrollChange: null,
+              padding: 80
+          });
+      });
+  </script>
+  
+
+  <!-- Highlight.js -->
+  <script>
+      async("//cdn.bootcss.com/highlight.js/9.4.0/highlight.min.js",function(){
+          hljs.initHighlightingOnLoad();
+      })
+  </script>
+
+<link href="//cdn.bootcss.com/highlight.js/9.4.0/styles/github.min.css" rel="stylesheet">
+
+
+
+  <!-- search -->
+<div class="search-tool" style="position: fixed; top: 0px ; bottom: 0px; left: 0px; right:  0px;
+      opacity: 0.95; background-color: #111111; z-index: 9999; display: none;">
+    <input type="text" class="form-control search-content" id="search-content" style="position: fixed; top: 60px"
+           placeholder="文章标题 日期 标签"
+           >
+
+    <div style="position: fixed; top: 16px; right: 16px;">
+        <img src="/search/img/cb-close.png"  id="close-btn"/>
+    </div>
+</div>
+
+<div style="position: fixed; right: 16px; bottom: 20px;">
+    <img src="/search/img/cb-search.png"  id="search-btn"  title="双击ctrl试一下"/>
+</div>
+
+<link rel="stylesheet" href="/search/css/cb-search.css">
+
+<script src="/search/js/bootstrap3-typeahead.min.js"></script>
+<script src="/search/js/cb-search.js"></script>
+
+
+
+<!-- Image to hack wechat -->
+<img src="/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

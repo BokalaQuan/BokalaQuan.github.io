@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keywords"  content="">
+    <meta name="theme-color" content="#000000">
+    
+    <title>遗传算法简述 - 权文明的博客 | Bokala Blog</title>
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/pwa/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="http://localhost:4000/2015/12/15/GA/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Bokala Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/aboutme/"> about</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/archives/">Archives</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/tags/">Tags</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    var __HuxNav__ = {
+        close: function(){
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        },
+        open: function(){
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+
+    // Bind Event
+    $toggle.addEventListener('click', function(e){
+        if ($navbar.className.indexOf('in') > 0) {
+            __HuxNav__.close()
+        }else{
+            __HuxNav__.open()
+        }
+    })
+
+    /**
+     * Since Fastclick is used to delegate 'touchstart' globally
+     * to hack 300ms delay in iOS by performing a fake 'click',
+     * Using 'e.stopPropagation' to stop 'touchstart' event from 
+     * $toggle/$collapse will break global delegation.
+     * 
+     * Instead, we use a 'e.target' filter to prevent handler
+     * added to document close HuxNav.  
+     *
+     * Also, we use 'click' instead of 'touchstart' as compromise
+     */
+    document.addEventListener('click', function(e){
+        if(e.target == $toggle) return;
+        if(e.target.className == 'icon-bar') return;
+        __HuxNav__.close();
+    })
+</script>
+
+
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/post-bg-ga.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/post-bg-ga.jpg')
+    }
+
+    
+</style>
+<header class="intro-header" >
+    <div class="header-mask"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/#GA" title="GA">GA</a>
+                        
+                        <a class="tag" href="/tags/#Algorithm" title="Algorithm">Algorithm</a>
+                        
+                    </div>
+                    <h1>遗传算法简述</h1>
+                    
+                    
+                    <h2 class="subheading">关于遗传算法的一篇概述</h2>
+                    
+                    <span class="meta">Posted by Bokala on December 15, 2015</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+				<p><strong>遗传算法</strong> (genetic algorithm, GA )是<a href="https://zh.wikipedia.org/wiki/%E8%AE%A1%E7%AE%97%E6%95%B0%E5%AD%A6">计算数学</a>中用于解决<a href="https://zh.wikipedia.org/wiki/%E6%9C%80%E4%BD%B3%E5%8C%96">最佳化</a>的搜索<a href="https://zh.wikipedia.org/wiki/%E7%AE%97%E6%B3%95">算法</a>，是<a href="https://zh.wikipedia.org/wiki/%E8%BF%9B%E5%8C%96%E7%AE%97%E6%B3%95">进化算法</a>的一种。进化算法最初是借鉴了<a href="https://zh.wikipedia.org/wiki/%E8%BF%9B%E5%8C%96%E7%94%9F%E7%89%A9%E5%AD%A6">进化生物学</a>中的一些现象而发展起来的，这些现象包括<a href="https://zh.wikipedia.org/wiki/%E9%81%97%E4%BC%A0">遗传</a>、<a href="https://zh.wikipedia.org/wiki/%E7%AA%81%E5%8F%98">突变</a>、<a href="https://zh.wikipedia.org/wiki/%E8%87%AA%E7%84%B6%E9%80%89%E6%8B%A9">自然选择</a>以及<a href="https://zh.wikipedia.org/wiki/%E6%9D%82%E4%BA%A4">杂交</a>等。遗传算法是模拟生物在自然环境中的遗传和进化过程而形成的一种自适应全局优化概率搜索算法。最早由美国密执安大学的<em>Holland</em> 教授提出，起源于60年代对自然和人工自适应系统的研究。70年代<em>De Jong</em> 基于遗传算法的思想在计算机上进行了大量的纯数值函数优化计算实验。在一系列研究工作的基础上，80年代由<em>Goldberg</em> 进行归纳总结，形成了遗传算法的基础框架。</p>
+
+<h1 id="生物学基础">生物学基础</h1>
+
+<p>生物在自然界中的生存繁衍，显示出了其对自然环境的优异自适应能力。受其启发，人们致力于对生物各种生存特性的机理研究和行为模拟，为人工自适应系统的设计和开发提供了广阔的前景。遗传算法就是这种生物行为的计算机模拟中的重要成果。基于对生物遗传和进化过程的计算机模拟，遗传算法使得各种人工系统具有优良的自适应能力和优化能力。遗传算法所借鉴的生物学基础就是生物的遗传和进化。</p>
+
+<h2 id="遗传与变异">遗传与变异</h2>
+
+<p>世间万物从其亲代继承特性或性状，这种生命现象就成为遗传（<em>Heredity</em>），研究这种生命现象的科学称之为遗传学。由于遗传的作用，使得人们可以种瓜得瓜种豆得豆，也使得鸟能在天空中飞翔，鱼能在水中遨游。</p>
+
+<p>构成生物的基本结构和功能的单位是细胞（<em>Cell</em>）。细胞中含有的一种微小的化合物称为染色体（<em>Chromosome</em>），生物的所有遗传信息均包含在这个复杂而又微小的染色体中。遗传信息是由基因（<em>Gene</em>）组成的，生物的各种性状由其对应的基因所控制，基因是遗传的基本单位。细胞通过分裂具有自我复制的能力，在细胞分裂的过程中，其遗传基因也被下一代所继承。经生物学家研究，现在人们已经明白控制并决定生物遗传性状的染色体主要由一种叫做DNA的物质所构成，除此之外，染色体中还含有大量的蛋白质。DNA在染色体中有规则的排列着，其基本单位是核苷酸。</p>
+
+<p>遗传基因在染色体中所占有的位置称为基因座（<em>Locus</em>），同一基因座可能有的全部基因称为等位基因（<em>Allele</em>）。某种生物所特有的基因及其构成形式称为该生物的基因型，而该生物在环境中呈现出的相应的性状称为该生物的表现型。</p>
+
+<p>细胞在分裂时，DNA通过复制（<em>Reproduction</em>）而转移到新产生的细胞中，新细胞就继承了旧细胞的基因。有性生殖生物在繁殖下一代时，两个同源染色体之间通过交叉（<em>Crossover</em>）而重组，即在两个染色体的某一相同位置处DNA被切断，其前后两串分别交叉组合而形成两个新的染色体。另外，在细胞复制时，虽然概率很小，但也有可能产生某些复制差错，从而使DNA发生某种变异（<em>Mutation</em>），产生出新的染色体。这些新的染色体表现出新的性状。如此，遗传基因或染色体在遗传的过程中由于各种各样的原因而发生变化。</p>
+
+<h2 id="进化">进化</h2>
+
+<p>生物在其延续生存的过程中，逐渐适应于其生存环境，使得其品质不断得到改良，这种生命现象称之为进化（<em>Evolution</em>）。生物的进化是以集团的形式共同进行的，这种的一个团体称为群体（<em>Population</em>），组成群体的单个生物称为个体（<em>Individual</em>），每一个个体对其生存环境都有不同的适应能力，这种适应能力称之为个体的适应度（<em>Fitness</em>）。达尔文的自然选择学说构成了现代进化论的主体。自然选择学说认为 ，通过不同生物之间的交配及其他一些原因，生物的基因有可能发生变异而形成一种新的生物基因，这部分变异了的基因也有可能将遗传到下一代。虽然这种变化的概率是可以预测的，但具体哪一个个体发生变化却是偶然的。这种新的基因依据其与环境的适应程度决定其生殖能力，有利于生存环境的基因逐渐增多，而不利于生存环境的基因逐渐减少。通过这种自然的选择，物种将逐渐地向适应于生存环境的方向进化，从而产生出优良的物种。</p>
+
+<h2 id="遗传与进化系统观">遗传与进化系统观</h2>
+
+<ul>
+  <li>生物的所有遗传信息均包含在其染色体中，染色体决定了生物的性状；</li>
+  <li>染色体是由基因及其有规律的排列所构成的，遗传和进化过程发生在染色体上；</li>
+  <li>生物的繁殖过程是由其基因的复制过程来完成的；</li>
+  <li>通过同源染色体之间的交叉或染色体的变异会产生新的物种，使生物呈现新的性状；</li>
+  <li>对环境适应性好的基因或染色体经常比适应性差的基因或染色体有更多的机会被遗传到下一代。</li>
+</ul>
+
+<h1 id="遗传算法">遗传算法</h1>
+
+<h2 id="最优化问题">最优化问题</h2>
+
+<p>对于一个求函数最大值优化问题（最小值类似），一般可描述为下述数学规划模型：
+<script type="math/tex">max f(X)</script></p>
+
+<script type="math/tex; mode=display">s.t. X\in R</script>
+
+<script type="math/tex; mode=display">R\subseteq U</script>
+
+<p>式中，<em>X</em> 为决策变量，<em>f(X)</em> 为目标函数。对于这些最优化问题，目标函数和约束条件种类繁多，有的是线性的，有的是非线性的；有的是连续的，有的是离散的；有的是单峰值的，有的是多峰值的。随研究的深入，人们逐渐认识到很多复杂情况下要想完全精确地求解出最优解既不可能也不现实，因而求出其近似最优解或满意解是人们的主要着眼点之一。总体来讲，求最优解或近似最优解的方法主要有三种：枚举法、启发式算法和搜索算法。</p>
+
+<h2 id="遗传算法优化思路">遗传算法优化思路</h2>
+<p>遗传算法中，将<em>n</em>维决策向量 <script type="math/tex">X = [x_1, x_2, ..., x_n]^T</script> 用 <em>n</em> 个记号 <script type="math/tex">X_i(i = 1, 2, ..., n)</script> 所组成的符号串<em>X</em> 来表示：
+<script type="math/tex">X=X_1X_2...X_n \Rightarrow X=[x_1, x_2, ..., x_n]^T</script>
+把每一个<script type="math/tex">X_i</script> 看作是一个遗传基因，它的所有的可能取值称为等位基因，这样，<em>X</em> 就可看做是由<em>n</em> 个遗传基因所组成的一个染色体。一般情况下，染色体的长度<em>n</em> 是固定的，但对一些问题来讲，<em>n</em> 有可能是变化的。染色体 <script type="math/tex">X</script> 也称为个体 <script type="math/tex">X</script> ，对于每一个个体，要按照一定的规则确定其适应度。个体的适应度与其对应的个体表现型 <script type="math/tex">X</script> 的目标函数值相关联， <script type="math/tex">X</script> 越接近于目标函数的最优点，其适应度越大；相反，其适应度越小。</p>
+
+<p>遗传算法中，决策变量 <script type="math/tex">X</script> 组成了问题的解空间。对于问题最优解的搜索是通过对染色体 <script type="math/tex">X</script> 的搜索过程来进行的，从而有所有的染色体 <script type="math/tex">X</script> 就组成了问题的搜索空间。</p>
+
+<p>生物的进化是以集团为主体的。与此相对应，遗传算法的运算对象是由<script type="math/tex">M</script> 个个体所组成的集合，称之为群体。与生物一代一代的自然进化过程相类似，遗传算法的运算过程也是一个反复迭代的过程，第 <script type="math/tex">t</script> 代群体记作 <script type="math/tex">P(t)</script> ，经过一代遗传和进化后，得到第<script type="math/tex">t+1</script> 代群体，它们也是由多个个体组成的集合，记作 <script type="math/tex">P(t+1)</script>  。这个群体不断地经过遗传和进化操作，并且每次都按照优胜劣汰的规则将适应度较高的个体更多的遗传到下一代，这样最终在群体中将会得到一个优良的个体 <script type="math/tex">X</script> ，它所对应的表现型 
+<script type="math/tex">X</script>
+将达到或接近于问题的最优解 
+<script type="math/tex">X^*</script>
+。</p>
+
+<p>生物的进化过程主要是通过染色体之间的交叉和变异来完成的，与此相对应的，遗传算法中最优解的搜索过程也模仿了生物的这一进化过程，使用所谓的遗传算子作用于群体 
+<script type="math/tex">P(t)</script>
+中，进行下述操作，从而得到新一代群体 
+<script type="math/tex">P(t+1)</script>
+。</p>
+
+<ul>
+  <li>选择（<em>Selection</em>）：根据每个个体的适应度，按照一定的规则，从第 
+<script type="math/tex">t</script>
+代群体 
+<script type="math/tex">P(t)</script>
+中选择出一些优良的个体遗传到下一代群体 
+<script type="math/tex">P(t+1)</script>
+中。</li>
+  <li>交叉（<em>Crossover</em>）：将群体中 
+<script type="math/tex">P(t)</script>
+内的每个个体随机搭配成对，对每个个体，以某种概率（交叉概率）交换它们之间的部分染色体。</li>
+  <li>变异（<em>Mutation</em>）：对群体 
+<script type="math/tex">P(t)</script>
+中的每个给他，以某种概率（变异概率）改变某一个或者某一些基因座上的基因值为其他的等位基因。</li>
+</ul>
+
+<h2 id="运算过程">运算过程</h2>
+
+<p><strong>步骤一</strong> ：初始化。设置进化代数计数器 
+<script type="math/tex">t \leftarrow 0</script>
+;设置最大进化代数
+<script type="math/tex">T</script>
+；随机生成 
+<script type="math/tex">M</script>
+个个体作为初始种群 
+<script type="math/tex">P(0)</script>
+。</p>
+
+<p><strong>步骤二</strong>：个体评价。计算群体 
+<script type="math/tex">P(t)</script>
+中各个个体的适应度。</p>
+
+<p><strong>步骤三</strong>：选择运算。将选择算子作用于群体。</p>
+
+<p><strong>步骤四</strong>：交叉运算。将交叉算子作用于群体。</p>
+
+<p><strong>步骤五</strong>：变异运算。将变异算子作用于群体。群体
+<script type="math/tex">P(t)</script>
+通过选择、交叉、变异运算过后，得到下一代群体 
+<script type="math/tex">P(t+1)</script>
+。</p>
+
+<p><strong>步骤六</strong>：终止条件判断。若 
+<script type="math/tex">t \leq T</script>
+，则：
+<script type="math/tex">t \leftarrow t+1</script>
+，转到步骤二；若
+<script type="math/tex">t > T</script>
+，则以进化过程中得到的具有最大适应度的个体作为最优解输出，终止计算。</p>
+
+<h2 id="特点">特点</h2>
+
+<ul>
+  <li>以决策变量的编码作为运算对象</li>
+  <li>直接以目标函数值作为搜索信息</li>
+  <li>同时使用多个搜索点的搜索信息</li>
+  <li>使用概率搜索技术</li>
+</ul>
+
+<h1 id="基本遗传算法">基本遗传算法</h1>
+
+<h2 id="构成要素">构成要素</h2>
+<ol>
+  <li>
+    <p>染色体编码方法。基本遗传算法使用固定长度的二进制符号串来表示群体中的个体，其等位基因是由二进制符号集
+<script type="math/tex">{0, 1}</script>
+所组成的。初始群体中各个个体的基因值可用均匀分布的随机数来生成。如
+<script type="math/tex">X=100111001000101101</script>
+就可以表示一个个体，该个体的染色体长度是18。</p>
+  </li>
+  <li>
+    <p>个体适应度评价。基本遗传算法按与个体适应度成正比的概率来决定当前群体中每个个体遗传到下一代群体中的机会多少。为了正确计算这个概率，这里要求所有个体的适应度必须为正数或者零。</p>
+  </li>
+  <li>
+    <p>遗传算子。基本遗传算法使用下述三种遗传算子：</p>
+  </li>
+</ol>
+
+<ul>
+  <li>选择运算使用比例选择算子；</li>
+  <li>交叉运算使用单点交叉算子；</li>
+  <li>变异运算使用基本位变异算子或均匀变异算子。</li>
+</ul>
+
+<ol>
+  <li>基本遗传算法的运行参数：</li>
+</ol>
+
+<ul>
+  <li><script type="math/tex">M</script> ：群体大小，即群体中所含个体的数量，一般取20~100；</li>
+  <li><script type="math/tex">T</script> ：遗传运算的终止进化代数，一般取100~500；</li>
+  <li><script type="math/tex">P_c</script> ：交叉概率，一般取值为0.4~0.99；</li>
+  <li><script type="math/tex">P_m</script> ：变异概率，一般取值为0.0001~0.1。</li>
+</ul>
+
+<h2 id="伪代码描述">伪代码描述</h2>
+
+<div class="language-matlab highlighter-rouge"><pre class="highlight"><code><span class="n">Procedure</span> <span class="n">SGA</span>
+<span class="n">begin</span>
+  <span class="n">initialize</span> <span class="n">P</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+  <span class="n">t</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="k">while</span><span class="p">(</span><span class="n">t</span> <span class="o">&lt;=</span> <span class="n">T</span><span class="p">)</span> <span class="n">do</span>
+    <span class="k">for</span> <span class="nb">i</span><span class="o">=</span><span class="mi">1</span> <span class="n">to</span> <span class="n">M</span> <span class="n">do</span>
+      <span class="n">Evaluate</span> <span class="n">fitness</span> <span class="n">of</span> <span class="n">P</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="k">end</span> <span class="k">for</span>
+    <span class="k">for</span> <span class="nb">i</span><span class="o">=</span><span class="mi">1</span> <span class="n">to</span> <span class="n">M</span> <span class="n">do</span>
+      <span class="n">Select</span> <span class="n">operation</span> <span class="n">to</span> <span class="n">P</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="k">end</span> <span class="k">for</span>
+    <span class="k">for</span> <span class="nb">i</span><span class="o">=</span><span class="mi">1</span> <span class="n">to</span> <span class="n">M</span><span class="p">/</span><span class="mi">2</span> <span class="n">do</span>
+      <span class="n">Crossover</span> <span class="n">operation</span> <span class="n">to</span> <span class="n">P</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="k">end</span> <span class="k">for</span>
+    <span class="k">for</span> <span class="nb">i</span><span class="o">=</span><span class="mi">1</span> <span class="n">to</span> <span class="n">M</span> <span class="n">do</span>
+      <span class="n">Mutation</span> <span class="n">operation</span> <span class="n">to</span> <span class="n">P</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="k">end</span> <span class="k">for</span>
+    <span class="k">for</span> <span class="nb">i</span><span class="o">=</span><span class="mi">1</span> <span class="n">to</span> <span class="n">M</span> <span class="n">do</span>
+      <span class="n">P</span><span class="p">(</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">P</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="k">end</span> <span class="k">for</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
+  <span class="k">end</span> <span class="k">while</span>
+<span class="k">end</span>
+</code></pre>
+</div>
+
+<h2 id="形式化定义">形式化定义</h2>
+
+<p>基本遗传算法可定义为一个八元组：
+<script type="math/tex">SGA = (C, E, P_0, M, \Phi, \Gamma, \Psi, T)</script>
+式中 <script type="math/tex">C</script> –个体的编码方法；<script type="math/tex">E</script> –个体适应度评价函数；<script type="math/tex">P_0</script> –初始种群；<script type="math/tex">M</script> –种群大小；<script type="math/tex">\Phi</script> –选择算子；<script type="math/tex">\Gamma</script> –交叉算子；<script type="math/tex">\Psi</script> –变异算子；<script type="math/tex">T</script> –运算终止条件。</p>
+
+<h2 id="实现">实现</h2>
+
+<h3 id="个体适应度评价">个体适应度评价</h3>
+
+<p>在遗传算法中，以个体适应度的大小来确定该个体被遗传到下一代的概率。基本遗传算法使用比例选择算子来确定群体中各个个体遗传到下一代群体中的数量。为了正确计算不同情况下各个个体的遗传概率，要求所有的个体的适应度必须为正数或者零，不能是负数。</p>
+
+<p>对于求目标函数最小值的优化问题，理论上只需简单地对其增加一个负号就可将其转换为目标函数最大值的优化问题，即
+<script type="math/tex">min  f(x) = max(-f(x))</script>
+当优化目标是求函数最大值，并且目标函数总取正数时，可以直接设定个体的适应度<script type="math/tex">F(x)</script> 就等于相应的目标函数值<script type="math/tex">f(x)</script> ，即
+<script type="math/tex">F(x)=f(x)</script>
+为了满足适应度取非负数的要求，基本遗传算法一般采用下面两种方法之一将目标函数值$f(x)$ 变换为个体的适应度<script type="math/tex">F(x)</script>。</p>
+
+<p><strong>方法一</strong> 对于求目标函数最大值的优化问题，变换方法为
+<script type="math/tex">% <![CDATA[
+F(x) = f(x) + C_{min},  f(x)+C_{min}>0;
+F(x)=0,f(x)+C_{min} <= 0 %]]></script>
+式中，<script type="math/tex">C_{min}</script> 为一个适当相对比较小的数，可用下面几种方法来选取。</p>
+
+<ol>
+  <li>预先指定的一个较小数；</li>
+  <li>进化到当前代为止的最小目标函数值；</li>
+  <li>当前代或者近几代群体中的最小目标函数值。</li>
+</ol>
+
+<p><strong>方法二</strong> 对于求目标函数最小值的优化问题，变换方法为
+<script type="math/tex">% <![CDATA[
+F(x)=C_{max}-f(x),f(x)<C_{max};F(x)=0,f(x)>=C_{max} %]]></script>
+式中，<script type="math/tex">C_{max}</script> 为一个适当地相对比较大的数，可用下面几种方法获取：</p>
+
+<ol>
+  <li>预先指定的一个较大的数；</li>
+  <li>进化到当前代为止的最大目标函数值；</li>
+  <li>当前代或者近几代群体中的最大目标函数值。</li>
+</ol>
+
+<h3 id="比例选择算子">比例选择算子</h3>
+
+<p><strong>轮盘赌</strong></p>
+
+<blockquote>
+  <ol>
+    <li>先计算出群体中所有个体的适应度的总和；</li>
+    <li>其次计算出每个个体的相对适应度的大小，它即是各个个体被遗传到下一代的概率；</li>
+    <li>最后使用模拟赌盘操作（即0~1之间的随机数）来确定各个个体被选中的次数。</li>
+  </ol>
+</blockquote>
+
+<h3 id="交叉算子">交叉算子</h3>
+
+<p><strong>单点交叉算子</strong></p>
+
+<blockquote>
+  <ol>
+    <li>对群体中的个体进行两两随机配对；</li>
+    <li>对每对相互配对的个体，随机设置某一基因座之后的位置为交叉点；</li>
+    <li>对每对相互配对的个体，依设定的交叉概率在其交叉点出相互交换两个个体的部分染色体，从而产生出两个新的个体。</li>
+  </ol>
+</blockquote>
+
+<table>
+  <tbody>
+    <tr>
+      <td><script type="math/tex">A</script>: 1 0 1 1 0 1 1 1</td>
+      <td>0 0 <script type="math/tex">\longrightarrow</script> <script type="math/tex">A^{\prime}</script> : 1 0 1 1 0 1 1 1</td>
+      <td>1 1</td>
+    </tr>
+  </tbody>
+</table>
+
+<table>
+  <tbody>
+    <tr>
+      <td><script type="math/tex">B</script>: 0 0 0 1 1 1 0 0</td>
+      <td>1 1 <script type="math/tex">\longrightarrow</script> <script type="math/tex">B^{\prime}</script> : 0 0 0 1 1 1 0 0</td>
+      <td>0 0</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="变异算子">变异算子</h3>
+
+<p><strong>基本位变异算子</strong></p>
+
+<blockquote>
+  <ol>
+    <li>对个体的每一个基因座，依据变异概率指定其为变异点；</li>
+    <li>对每个指定点，对其基因值做取反运算或用其等位基因值来替代，从而产生一个新的个体。</li>
+  </ol>
+</blockquote>
+
+<p><script type="math/tex">A</script>: 1 0 1 1 <u>0</u> 1 1 1  <script type="math/tex">\longrightarrow</script> <script type="math/tex">A^{\prime}</script> : 1 0 1 1 <u>1</u> 1 1 1</p>
+
+<h3 id="具体应用">具体应用</h3>
+
+<p><strong>第一步：</strong> 确定决策变量及其各种约束条件，即确定出个体的表现型和问题的解空间；</p>
+
+<p><strong>第二步：</strong> 建立优化模型，即确定出目标函数的类型及其数学描述形式或量化方法；</p>
+
+<p><strong>第三步：</strong> 确定表示可行解的染色体编码方法，即确定出个体的基因型及遗传算法的搜索空间；</p>
+
+<p><strong>第四步：</strong> 确定编码方法，即确定出由个体基因型到个体表现型的对应关系或转换方法；</p>
+
+<p><strong>第五步：</strong> 确定个体适应度的量化评价方法，即确定出由目标函数值到个体适应度的转换规则；</p>
+
+<p><strong>第六步：</strong> 设计遗传算子，即确定出选择运算、交叉运算、变异运算等遗传算子的具体操作方法；</p>
+
+<p><strong>第七步：</strong> 确定遗传算法的有关运行参数，即确定出遗传算法的<script type="math/tex">M</script>, <script type="math/tex">T</script>, <script type="math/tex">P_c</script>, <script type="math/tex">P_m</script> 等参数。</p>
+
+<!-- zanshang -->
+<div>
+  
+
+
+      
+    </div>
+                <hr>
+
+                
+
+
+                <ul class="pager">
+                    
+                    
+                    <li class="next">
+                        <a href="/2016/03/20/multicast/" data-toggle="tooltip" data-placement="top" title="组播技术简介">
+                        Next<br>
+                        <span>组播技术简介</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+
+
+                
+
+                
+
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
+        
+
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+        			</div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("http://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    <li>
+                        <a href="/feed.xml">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+ 					 <!--
+                    
+                    -->
+
+                    <!-- add lofter,ins by teng, add target = "_blank" to <a> by Hux -->
+                    
+                    
+                    
+
+                     
+
+                     <!-- add lofter,ins by teng, add target = "_blank" to <a> by Hux -->
+                    
+
+                       
+
+                    <!-- add Weibo, Zhihu by Hux, add target = "_blank" to <a> by Hux -->
+                    
+                    
+                    <li>
+                        <a target="_blank" href="http://weibo.com/Wainamoinen">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+
+
+                    
+                    
+                    <li>
+                        <a target="_blank" href="https://github.com/BokalaQuan">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                    
+                    
+
+                  </ul>
+                  <p class="copyright text-muted">
+                      Copyright &copy; Bokala Blog 2017
+                      <br>
+                      Write by <a href="http://weibo.com/yanchufei">Teng</a> | 对世界保持学习力
+
+                  </p>
+              </div>
+          </div>
+      </div>
+
+
+  </footer>
+  <!-- jQuery -->
+  <script src="/js/jquery.min.js "></script>
+
+  <!-- Bootstrap Core JavaScript -->
+  <script src="/js/bootstrap.min.js "></script>
+
+  <!-- Custom Theme JavaScript -->
+  <script src="/js/hux-blog.min.js "></script>
+
+
+  <!-- async load function -->
+  <script>
+      function async(u, c) {
+        var d = document, t = 'script',
+            o = d.createElement(t),
+            s = d.getElementsByTagName(t)[0];
+        o.src = u;
+        if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+        s.parentNode.insertBefore(o, s);
+      }
+  </script>
+
+  <!--
+       Because of the native support for backtick-style fenced code blocks
+       right within the Markdown is landed in Github Pages,
+       From V1.6, There is no need for Highlight.js,
+       so Huxblog drops it officially.
+       - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0
+       - https://help.github.com/articles/creating-and-highlighting-code-blocks/
+       - https://github.com/jneen/rouge/wiki/list-of-supported-languages-and-lexers
+  -->
+  <!--
+      <script>
+          async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+              hljs.initHighlightingOnLoad();
+          })
+      </script>
+      <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+  -->
+
+
+  <!-- jquery.tagcloud.js -->
+  <script>
+      // only load tagcloud.js in tag.html
+      if($('#tag_cloud').length !== 0){
+          async('/js/jquery.tagcloud.js',function(){
+              $.fn.tagcloud.defaults = {
+                  //size: {start: 1, end: 1, unit: 'em'},
+                  color: {start: '#bbbbee', end: '#0085a1'},
+              };
+              $('#tag_cloud a').tagcloud();
+          })
+      }
+  </script>
+
+  <!--fastClick.js -->
+  <script>
+      async("http://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+          var $nav = document.querySelector("nav");
+          if($nav) FastClick.attach($nav);
+      })
+  </script>
+
+
+  <!-- Google Analytics -->
+  
+
+
+  <!-- Baidu Tongji -->
+  
+
+
+
+  <!-- Side Catalog -->
+  
+  <script type="text/javascript">
+      function generateCatalog (selector) {
+          var P = $('div.post-container'),a,n,t,l,i,c;
+          a = P.find('h1,h2,h3,h4,h5,h6');
+          a.each(function () {
+              n = $(this).prop('tagName').toLowerCase();
+              i = "#"+$(this).prop('id');
+              t = $(this).text();
+              c = $('<a href="'+i+'" rel="nofollow">'+t+'</a>');
+              l = $('<li class="'+n+'_nav"></li>').append(c);
+              $(selector).append(l);
+          });
+          return true;
+      }
+      generateCatalog(".catalog-body");
+      // toggle side catalog
+      $(".catalog-toggle").click((function(e){
+          e.preventDefault();
+          $('.side-catalog').toggleClass("fold")
+      }))
+      /*
+       * Doc: https://github.com/davist11/jQuery-One-Page-Nav
+       * Fork by Hux to support padding
+       */
+      async("/js/jquery.nav.js", function () {
+          $('.catalog-body').onePageNav({
+              currentClass: "active",
+              changeHash: !1,
+              easing: "swing",
+              filter: "",
+              scrollSpeed: 700,
+              scrollOffset: 0,
+              scrollThreshold: .2,
+              begin: null,
+              end: null,
+              scrollChange: null,
+              padding: 80
+          });
+      });
+  </script>
+  
+
+  <!-- Highlight.js -->
+  <script>
+      async("//cdn.bootcss.com/highlight.js/9.4.0/highlight.min.js",function(){
+          hljs.initHighlightingOnLoad();
+      })
+  </script>
+
+<link href="//cdn.bootcss.com/highlight.js/9.4.0/styles/github.min.css" rel="stylesheet">
+
+
+
+  <!-- search -->
+<div class="search-tool" style="position: fixed; top: 0px ; bottom: 0px; left: 0px; right:  0px;
+      opacity: 0.95; background-color: #111111; z-index: 9999; display: none;">
+    <input type="text" class="form-control search-content" id="search-content" style="position: fixed; top: 60px"
+           placeholder="文章标题 日期 标签"
+           >
+
+    <div style="position: fixed; top: 16px; right: 16px;">
+        <img src="/search/img/cb-close.png"  id="close-btn"/>
+    </div>
+</div>
+
+<div style="position: fixed; right: 16px; bottom: 20px;">
+    <img src="/search/img/cb-search.png"  id="search-btn"  title="双击ctrl试一下"/>
+</div>
+
+<link rel="stylesheet" href="/search/css/cb-search.css">
+
+<script src="/search/js/bootstrap3-typeahead.min.js"></script>
+<script src="/search/js/cb-search.js"></script>
+
+
+
+<!-- Image to hack wechat -->
+<img src="/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

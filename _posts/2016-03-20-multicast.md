@@ -5,8 +5,10 @@ date: 2016-03-20
 subtitle: "介绍组播的产生背景、组播传输机制和相关协议"
 author: Bokala
 catalog: 
- - Computer Network
-tags: [Multicast, Computer Network]
+- Computer Network
+tags: 
+- Multicast
+- Computer Network
 ---
 
 

@@ -153,6 +153,30 @@
 </script>
 
 
+    
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
     <!-- Image to hack wechat -->
 <!-- <img src="/img/post-bg-ga.jpg" width="0" height="0"> -->
 
@@ -502,10 +526,7 @@ F(x)=C_{max}-f(x),f(x)<C_{max};F(x)=0,f(x)>=C_{max} %]]></script>
 
 <!-- zanshang -->
 <div>
-  
-
-
-      
+ 
     </div>
                 <hr>
 
@@ -583,47 +604,6 @@ F(x)=C_{max}-f(x),f(x)<C_{max};F(x)=0,f(x)>=C_{max} %]]></script>
 
 
 
-
-
-
-
-
-<!-- async load function -->
-<script>
-    function async(u, c) {
-      var d = document, t = 'script',
-          o = d.createElement(t),
-          s = d.getElementsByTagName(t)[0];
-      o.src = u;
-      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
-      s.parentNode.insertBefore(o, s);
-    }
-</script>
-<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
-<script>
-    async("http://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
-        anchors.options = {
-          visible: 'always',
-          placement: 'right',
-          icon: '#'
-        };
-        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
-    })
-</script>
-<style>
-    /* place left on bigger screen */
-    @media all and (min-width: 800px) {
-        .anchorjs-link{
-            position: absolute;
-            left: -0.75em;
-            font-size: 1.1em;
-            margin-top : -0.1em;
-        }
-    }
-</style>
-
-
-
     <!-- Footer -->
 <footer>
     <div class="container">
@@ -684,8 +664,7 @@ F(x)=C_{max}-f(x),f(x)<C_{max};F(x)=0,f(x)>=C_{max} %]]></script>
                   </ul>
                   <p class="copyright text-muted">
                       Copyright &copy; Bokala Blog 2017
-                      <br>
-                      Write by <a href="http://weibo.com/yanchufei">Teng</a> | 对世界保持学习力
+                      
 
                   </p>
               </div>
@@ -845,9 +824,6 @@ F(x)=C_{max}-f(x),f(x)<C_{max};F(x)=0,f(x)>=C_{max} %]]></script>
 
 
 
-<!-- Image to hack wechat -->
-<img src="/img/icon_wechat.png" width="0" height="0" />
-<!-- Migrate from head to bottom, no longer block render and still work -->
 
 </body>
 

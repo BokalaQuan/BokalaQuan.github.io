@@ -1,7 +1,7 @@
 ---
 layout: page
 title: " about"
-description: "Hey, this is MaTeng."
+description: "我是权文明，谢谢你来观看我的博客"
 header-img: "img/home-bg.jpg"
 ---
 

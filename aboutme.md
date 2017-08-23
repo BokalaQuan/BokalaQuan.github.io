@@ -1,8 +1,8 @@
 ---
 layout: page
-title: " about"
-description: "我是权文明，谢谢你来观看我的博客"
-header-img: "img/home-bg.jpg"
+title: "About"
+description: "我是权文明，我在这里等你"
+header-img: "img/about-bg.jpg"
 ---
 
 ## Research
@@ -13,3 +13,7 @@ header-img: "img/home-bg.jpg"
 ## Hobby
 * Balls, like Ping-Pang, and so on
 * League of legends
+
+## Contact Me
+* E-Mail: quanwenming@outlook.com
+* QQ: 1424101147

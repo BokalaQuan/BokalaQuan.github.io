@@ -7,10 +7,10 @@ header-img: "img/about-me.jpg"
 
 ## Research
 * Multi-objective Optimization
-* Softeare-Defined Networking
-* Evolutionary Cpmputing
+* Software-Defined Networking
+* Evolutionary Computation
 
-## Hobby
+## Hobbys
 * Balls, like Ping-Pang, and so on
 * League of legends
 

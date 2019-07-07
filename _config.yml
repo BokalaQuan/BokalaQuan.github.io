@@ -5,7 +5,7 @@ header-img: img/home-bg1.jpg
 email: quanwenming@outlook.com
 description: “”
 url: ""              # your host, for absolute URL
-baseurl: ""                             # for example, '/blog' if your blog hosted on 'host/blog'
+baseurl: ""          # for example, '/blog' if your blog hosted on 'host/blog'
 
 
 
@@ -15,10 +15,6 @@ search: true
 # SNS settings
 #RSS: true
 weibo_username: Wainamoinen
-#instagram_username: lovemadao
-#jianshu_username: erLDs1
-#linkedin_username: 文明-权-b2014095
-#zhihu_username: BokalaQuan
 github_username: BokalaQuan
 
 
